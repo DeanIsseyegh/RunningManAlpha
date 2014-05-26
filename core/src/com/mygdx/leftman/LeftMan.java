@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.leftman.characters.MainCharacter;
 
 public class LeftMan implements ApplicationListener
 {
@@ -42,12 +43,7 @@ public class LeftMan implements ApplicationListener
 	
 	OrthographicCamera camera;
 	
-	Vector2 manVelocity;
-	Vector2 manPosition;
-	Vector2 manJumpVelocity;
-	Texture walkingManSheet;
-	Animation walkingManAnimation;
-	Rectangle manBox;
+	MainCharacter mainChar;
 	
 	float animationTime;
 	float time;
@@ -65,8 +61,8 @@ public class LeftMan implements ApplicationListener
 	@Override
 	public void create()
 	{
+		mainChar = new MainCharacter();
 		initBackground();
-		initMan();
 		initEnemy1();
 		initEnemy2();
 		batch = new SpriteBatch();
@@ -81,27 +77,6 @@ public class LeftMan implements ApplicationListener
 		
 		for (int i = 0; i < 3; i++)
 			backgroundPositions.add(level1BackgroundWidth * i);
-	}
-	
-	/**
-	 * initMan()
-	 * 
-	 * Private method responsible for setting up the main character sprite and animation.
-	 * Also defines his starting position, walk speed, jump speed and sets the initial jump state to false (isMainInAir = false).
-	 */
-	private void initMan(){
-		walkingManSheet = new Texture(Gdx.files.internal(MAIN_CHAR_IMAGE)); //608 x 240 pixels - 8 COLS, 2 ROWS
-		manPosition = new Vector2(0, 0);
-		manVelocity = new Vector2(200, 0);
-		manJumpVelocity = new Vector2(0, 300);
-		isManInAir = false;
-		manBox = new Rectangle();
-		
-		int FRAME_COLS = 8;
-		int FRAME_ROWS = 2;
-		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, walkingManSheet);
-		
-		walkingManAnimation = new Animation(0.05f, aniFrames);
 	}
 	
 	/**
@@ -178,33 +153,14 @@ public class LeftMan implements ApplicationListener
 		batch.begin();
 	 	
 		renderInfiniteBackground();
-		
-		//If user touches the screen then jump
-		if (Gdx.input.isTouched() && manPosition.y <= 0  && time > 1 || isManInAir == true){
-			animationTime = 0;
-			isManInAir = true;
-			manJumpVelocity.y -= 300 * deltaTime;
-			manPosition.y += manJumpVelocity.y * deltaTime;
-			if (manPosition.y > hardCodedJumpHeight) 
-				manJumpVelocity.y = -manJumpVelocity.y ;
-		} 
-		
-		if (manPosition.y <= 0){
-			manPosition.y = 0;
-			manJumpVelocity.y = 300;
-			isManInAir = false;
-		}
-		
-		//Change character positions based on their velocity and deltaTime (time between last render call)
-		manPosition.x += + manVelocity.x * deltaTime;
-		manBox.set(manPosition.x, manPosition.y, 125, 200);
-		enemy2Box.set(enemy2Position.x, enemy2Position.y, 100, 100);
-		
+
 		enemy1Position.x += enemy1Velocity.x * deltaTime;
 		
-		//Draw the characters and 'animate' them - basically show their next frame based on time passed between last render call.
-	 	batch.draw(walkingManAnimation.getKeyFrame(animationTime, true), manPosition.x , manPosition.y, 200, 200);
+		enemy2Box.set(enemy2Position.x, enemy2Position.y, 100, 100);
+		mainChar.update(deltaTime, batch);
+
 	 	batch.draw(walkingEnemy1.getKeyFrame(time, true), enemy1Position.x , enemy1Position.y, 100, 150);
+	 	
 	 	batch.draw(animatingEnemy2.getKeyFrame(time, true), enemy2Position.x , enemy2Position.y, 100, 100);
 	 		
 		batch.end();		
@@ -223,11 +179,11 @@ public class LeftMan implements ApplicationListener
 	 * 
 	 */
 	private void renderInfiniteBackground(){
-		if (manPosition.x > backgroundPositions.get(0) + level1BackgroundWidth && backgroundPositions.get(0) != 0){
+		if (mainChar.getX() > backgroundPositions.get(0) + level1BackgroundWidth && backgroundPositions.get(0) != 0){
 			backgroundPositions.remove(0);
 			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + level1BackgroundWidth );
 		} else if (backgroundPositions.get(0) == 0 
-					&& manPosition.x > level1BackgroundWidth * 2) {
+					&& mainChar.getX() > level1BackgroundWidth * 2) {
 			backgroundPositions.remove(0);
 			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + level1BackgroundWidth );
 		}
@@ -273,7 +229,7 @@ public class LeftMan implements ApplicationListener
 	private boolean gameOverConditions(){
 		boolean isGameOver = false;
 		
-		if (manBox.overlaps(enemy2Box))
+		if (mainChar.getBoundingBox().overlaps(enemy2Box))
 			resetGame();
 		
 		return isGameOver;
