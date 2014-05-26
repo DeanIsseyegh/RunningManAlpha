@@ -13,12 +13,14 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class LeftMan implements ApplicationListener
 {
 	private static final String TAG = "MyActivity";
 	private static final String ENEMY1_IMAGE = "Enemy1.png";
+	private static final String ENEMY2_IMAGE = "Enemy2_1.png";
 	private static final String MAIN_CHAR_IMAGE = "adjustedMan.png";
 	private static final String BG1_IMAGE = "skybackground.png";
 	
@@ -31,6 +33,11 @@ public class LeftMan implements ApplicationListener
 	Vector2 enemy1Velocity;
 	Vector2 enemy1Position;
 
+	Texture enemy2;
+	Animation animatingEnemy2;
+	Vector2 enemy2Position;
+	Rectangle enemy2Box;
+	
 	SpriteBatch batch;
 	
 	OrthographicCamera camera;
@@ -40,10 +47,11 @@ public class LeftMan implements ApplicationListener
 	Vector2 manJumpVelocity;
 	Texture walkingManSheet;
 	Animation walkingManAnimation;
+	Rectangle manBox;
 	
 	float animationTime;
 	float time;
-	float hardCodedJumpHeight = 125;
+	float hardCodedJumpHeight = 150;
 	int actualWidth;
 	int actualHeight;
 	boolean isManInAir;
@@ -60,6 +68,7 @@ public class LeftMan implements ApplicationListener
 		initBackground();
 		initMan();
 		initEnemy1();
+		initEnemy2();
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		actualHeight = 800;
@@ -81,23 +90,18 @@ public class LeftMan implements ApplicationListener
 	 * Also defines his starting position, walk speed, jump speed and sets the initial jump state to false (isMainInAir = false).
 	 */
 	private void initMan(){
+		walkingManSheet = new Texture(Gdx.files.internal(MAIN_CHAR_IMAGE)); //608 x 240 pixels - 8 COLS, 2 ROWS
 		manPosition = new Vector2(0, 0);
 		manVelocity = new Vector2(200, 0);
 		manJumpVelocity = new Vector2(0, 300);
 		isManInAir = false;
+		manBox = new Rectangle();
 		
-		walkingManSheet = new Texture(Gdx.files.internal(MAIN_CHAR_IMAGE)); //608 x 240 pixels - 8 COLS, 2 ROWS
 		int FRAME_COLS = 8;
 		int FRAME_ROWS = 2;
-		TextureRegion[][] tmpWalkMan = TextureRegion.split(walkingManSheet, walkingManSheet.getWidth() / FRAME_COLS, walkingManSheet.getHeight() / FRAME_ROWS);
-		TextureRegion[] walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, walkingManSheet);
 		
-		int index = 0;
-		for (int i = 0; i < FRAME_ROWS; i++)
-			for (int j = 0; j < FRAME_COLS; j++)
-				walkFrames[index++] = tmpWalkMan[i][j];
-		
-		walkingManAnimation = new Animation(0.05f, walkFrames);
+		walkingManAnimation = new Animation(0.05f, aniFrames);
 	}
 	
 	/**
@@ -115,16 +119,39 @@ public class LeftMan implements ApplicationListener
 
 		int FRAME_COLS = 5;
 		int FRAME_ROWS = 1;
-		TextureRegion[][] tmpWalkDuck = TextureRegion.split(enemy1, enemy1.getWidth() / FRAME_COLS, enemy1.getHeight() / FRAME_ROWS);
-		TextureRegion[] walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, enemy1);
+		ArrayUtils.reverse(aniFrames);
+		walkingEnemy1 = new Animation(0.1f, aniFrames);
+	}
+	
+	private void initEnemy2(){
+		enemy2 = new Texture(Gdx.files.internal(ENEMY2_IMAGE));
+		enemy2Position = new Vector2(1000, 0);
+		enemy2Box = new Rectangle();
+
+		int FRAME_COLS = 3;
+		int FRAME_ROWS = 1;
+		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, enemy2);
+		animatingEnemy2 = new Animation(0.4f, aniFrames);
+	}
+	/**
+	 * Will take in a spriteSheet image and return it as an Animation object.
+	 * 
+	 * @param int cols - Number of columns in spriteSheet
+	 * @param int rows = Number of rows in spriteSheet
+	 * @param Texture spriteSheet - The Texture object containing the spriteSheet
+	 * @return
+	 */
+	private TextureRegion[] animateFromSpriteSheet(int cols, int rows, Texture spriteSheet){
+		TextureRegion[][] tmpAniFrames = TextureRegion.split(spriteSheet, spriteSheet.getWidth() / cols, spriteSheet.getHeight() / rows);
+		TextureRegion[] aniFrames = new TextureRegion[cols * rows];
 		
 		int index = 0;
-		for (int i = 0; i < FRAME_ROWS; i++)
-			for (int j = 0; j < FRAME_COLS; j++)
-				walkFrames[index++] = tmpWalkDuck[i][j];
-	
-		ArrayUtils.reverse(walkFrames);
-		walkingEnemy1 = new Animation(0.1f, walkFrames);
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
+				aniFrames[index++] = tmpAniFrames[i][j];
+		
+		return aniFrames;
 	}
 	
 	/**
@@ -170,19 +197,20 @@ public class LeftMan implements ApplicationListener
 		
 		//Change character positions based on their velocity and deltaTime (time between last render call)
 		manPosition.x += + manVelocity.x * deltaTime;
+		manBox.set(manPosition.x, manPosition.y, 125, 200);
+		enemy2Box.set(enemy2Position.x, enemy2Position.y, 100, 100);
+		
 		enemy1Position.x += enemy1Velocity.x * deltaTime;
 		
 		//Draw the characters and 'animate' them - basically show their next frame based on time passed between last render call.
 	 	batch.draw(walkingManAnimation.getKeyFrame(animationTime, true), manPosition.x , manPosition.y, 200, 200);
-	 	batch.draw(walkingEnemy1.getKeyFrame(time, true), enemy1Position.x , enemy1Position.y, 150, 150);
-	 	
-	 	//If man goes off the screen, return to start of screen.
-	 /*	if (manPosition.x > actualWidth) 
-	 		manPosition.x = -200;*/
+	 	batch.draw(walkingEnemy1.getKeyFrame(time, true), enemy1Position.x , enemy1Position.y, 100, 150);
+	 	batch.draw(animatingEnemy2.getKeyFrame(time, true), enemy2Position.x , enemy2Position.y, 100, 100);
 	 		
 		batch.end();		
 		
 		camera.translate(200 * deltaTime, 0);
+		gameOverConditions();
 	}
 
 	/**
@@ -211,16 +239,6 @@ public class LeftMan implements ApplicationListener
 	public void dispose()
 	{
 	}
-
-	private void configureCamera(){
-		if (Gdx.graphics.getHeight() < Gdx.graphics.getWidth()) {
-			actualWidth = actualHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
-			camera.setToOrtho(false, actualWidth, actualHeight);
-		} else {
-			actualWidth = actualHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
-			camera.setToOrtho(false, actualHeight, actualWidth);
-		}
-	}
 	
 	@Override
 	public void resize(int width, int height)
@@ -238,4 +256,26 @@ public class LeftMan implements ApplicationListener
 	{
 	}
 	
+	private void configureCamera(){
+		if (Gdx.graphics.getHeight() < Gdx.graphics.getWidth()) {
+			actualWidth = actualHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+			camera.setToOrtho(false, actualWidth, actualHeight);
+		} else {
+			actualWidth = actualHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+			camera.setToOrtho(false, actualHeight, actualWidth);
+		}
+	}
+	
+	private void resetGame(){
+		configureCamera();
+		create();
+	}
+	private boolean gameOverConditions(){
+		boolean isGameOver = false;
+		
+		if (manBox.overlaps(enemy2Box))
+			resetGame();
+		
+		return isGameOver;
+	}
 }
