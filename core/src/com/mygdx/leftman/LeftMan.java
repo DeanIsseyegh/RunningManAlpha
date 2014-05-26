@@ -17,8 +17,14 @@ import com.badlogic.gdx.math.Vector2;
 
 public class LeftMan implements ApplicationListener
 {
+	private static final String TAG = "MyActivity";
+	private static final String ENEMY1_IMAGE = "Enemy1.png";
+	private static final String MAIN_CHAR_IMAGE = "adjustedMan.png";
+	private static final String BG1_IMAGE = "skybackground.png";
+	
 	Texture level1Background;
 	final int level1BackgroundWidth = 1200;
+	ArrayList<Integer> backgroundPositions; 
 	
 	Texture enemy1;
 	Animation walkingEnemy1;
@@ -61,12 +67,11 @@ public class LeftMan implements ApplicationListener
 	}
 	
 	private void initBackground(){
-		level1Background = new Texture(Gdx.files.internal("skybackground.png"));
-		list1 = new ArrayList<Integer>(); 
+		level1Background = new Texture(Gdx.files.internal(BG1_IMAGE));
+		backgroundPositions = new ArrayList<Integer>(); 
 		
 		for (int i = 0; i < 3; i++)
-			list1.add(level1BackgroundWidth * i);
-		Log.v(TAG, "FIRST INDEX IS: " + list1.get(0));
+			backgroundPositions.add(level1BackgroundWidth * i);
 	}
 	
 	/**
@@ -81,7 +86,7 @@ public class LeftMan implements ApplicationListener
 		manJumpVelocity = new Vector2(0, 300);
 		isManInAir = false;
 		
-		walkingManSheet = new Texture(Gdx.files.internal("adjustedMan.png")); //608 x 240 pixels - 8 COLS, 2 ROWS
+		walkingManSheet = new Texture(Gdx.files.internal(MAIN_CHAR_IMAGE)); //608 x 240 pixels - 8 COLS, 2 ROWS
 		int FRAME_COLS = 8;
 		int FRAME_ROWS = 2;
 		TextureRegion[][] tmpWalkMan = TextureRegion.split(walkingManSheet, walkingManSheet.getWidth() / FRAME_COLS, walkingManSheet.getHeight() / FRAME_ROWS);
@@ -104,7 +109,7 @@ public class LeftMan implements ApplicationListener
 	 * Note that the frames are reversed so the enemy does not having a walking backwards animation (spriteSheet has images in wrong order).
 	 */
 	private void initEnemy1(){
-		enemy1 = new Texture(Gdx.files.internal("Turtles.png"));
+		enemy1 = new Texture(Gdx.files.internal(ENEMY1_IMAGE));
 		enemy1Velocity = new Vector2(-200, 0);
 		enemy1Position = new Vector2(1000, 0);
 
@@ -131,8 +136,6 @@ public class LeftMan implements ApplicationListener
 	 * Important to take note of the Gdx.graphics.getDeltaTime() - this returns the amount of time passed between
 	 * the last render call in float format.
 	 */
-	ArrayList<Integer> list1; 
-	private static final String TAG = "MyActivity";
 	@Override
 	public void render()
 	{        
@@ -148,6 +151,8 @@ public class LeftMan implements ApplicationListener
 		batch.begin();
 	 	
 		renderInfiniteBackground();
+		
+		//If user touches the screen then jump
 		if (Gdx.input.isTouched() && manPosition.y <= 0  && time > 1 || isManInAir == true){
 			animationTime = 0;
 			isManInAir = true;
@@ -180,18 +185,27 @@ public class LeftMan implements ApplicationListener
 		camera.translate(200 * deltaTime, 0);
 	}
 
+	/**
+	 * renderInfiniteBackground()
+	 * 
+	 * A helper method used to render an infinite background so when the game scrolls, backgrounds keep getting rendered.
+	 * 
+	 * We could essentially render 1000 backgrounds and there would be no need for this method, but this has an impact
+	 * on performance. This method means only 3 backgrounds will be rendered at a given time!
+	 * 
+	 */
 	private void renderInfiniteBackground(){
-		if (manPosition.x > list1.get(0) * 2 && list1.get(0) != 0){
-			list1.remove(0);
-			list1.add( list1.get(list1.size() - 1) + level1BackgroundWidth );
-		} else if (list1.get(0) == 0) {
-			if (manPosition.x > level1BackgroundWidth * 2)
-				list1.remove(0);
-				list1.add( list1.get(list1.size() - 1) + level1BackgroundWidth );
+		if (manPosition.x > backgroundPositions.get(0) + level1BackgroundWidth && backgroundPositions.get(0) != 0){
+			backgroundPositions.remove(0);
+			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + level1BackgroundWidth );
+		} else if (backgroundPositions.get(0) == 0 
+					&& manPosition.x > level1BackgroundWidth * 2) {
+			backgroundPositions.remove(0);
+			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + level1BackgroundWidth );
 		}
 		
-		for (int i = 0; i < list1.size(); i++)
-			batch.draw(level1Background, list1.get(i), 0);
+		for (int i = 0; i < backgroundPositions.size(); i++)
+			batch.draw(level1Background, backgroundPositions.get(i), 0);
 	}
 	@Override
 	public void dispose()
