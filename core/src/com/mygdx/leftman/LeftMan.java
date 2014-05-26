@@ -1,19 +1,24 @@
 package com.mygdx.leftman;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import android.util.Log;
+
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 
 public class LeftMan implements ApplicationListener
 {
-	Texture forestBackground;
+	Texture level1Background;
+	final int level1BackgroundWidth = 1200;
 	
 	Texture enemy1;
 	Animation walkingEnemy1;
@@ -46,13 +51,22 @@ public class LeftMan implements ApplicationListener
 	@Override
 	public void create()
 	{
-		forestBackground = new Texture(Gdx.files.internal("forest-background_small.jpg"));
+		initBackground();
 		initMan();
 		initEnemy1();
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		actualHeight = 800;
 		configureCamera();
+	}
+	
+	private void initBackground(){
+		level1Background = new Texture(Gdx.files.internal("skybackground.png"));
+		list1 = new ArrayList<Integer>(); 
+		
+		for (int i = 0; i < 3; i++)
+			list1.add(level1BackgroundWidth * i);
+		Log.v(TAG, "FIRST INDEX IS: " + list1.get(0));
 	}
 	
 	/**
@@ -117,20 +131,23 @@ public class LeftMan implements ApplicationListener
 	 * Important to take note of the Gdx.graphics.getDeltaTime() - this returns the amount of time passed between
 	 * the last render call in float format.
 	 */
+	ArrayList<Integer> list1; 
+	private static final String TAG = "MyActivity";
 	@Override
 	public void render()
 	{        
+		
 	    Gdx.gl.glClearColor(0, 159, 205, 0);
 	    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+	    
 	    float deltaTime = Gdx.graphics.getDeltaTime();
 	    animationTime += deltaTime;
 	    time += Gdx.graphics.getDeltaTime();
 	    camera.update();
 	    batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		
-		batch.draw(forestBackground, 0, 0);
 	 	
+		renderInfiniteBackground();
 		if (Gdx.input.isTouched() && manPosition.y <= 0  && time > 1 || isManInAir == true){
 			animationTime = 0;
 			isManInAir = true;
@@ -146,17 +163,36 @@ public class LeftMan implements ApplicationListener
 			isManInAir = false;
 		}
 		
+		//Change character positions based on their velocity and deltaTime (time between last render call)
 		manPosition.x += + manVelocity.x * deltaTime;
 		enemy1Position.x += enemy1Velocity.x * deltaTime;
+		
+		//Draw the characters and 'animate' them - basically show their next frame based on time passed between last render call.
 	 	batch.draw(walkingManAnimation.getKeyFrame(animationTime, true), manPosition.x , manPosition.y, 200, 200);
 	 	batch.draw(walkingEnemy1.getKeyFrame(time, true), enemy1Position.x , enemy1Position.y, 150, 150);
 	 	
-	 	if (manPosition.x > actualWidth) 
-	 		manPosition.x = -200;
+	 	//If man goes off the screen, return to start of screen.
+	 /*	if (manPosition.x > actualWidth) 
+	 		manPosition.x = -200;*/
 	 		
 		batch.end();		
+		
+		camera.translate(200 * deltaTime, 0);
 	}
 
+	private void renderInfiniteBackground(){
+		if (manPosition.x > list1.get(0) * 2 && list1.get(0) != 0){
+			list1.remove(0);
+			list1.add( list1.get(list1.size() - 1) + level1BackgroundWidth );
+		} else if (list1.get(0) == 0) {
+			if (manPosition.x > level1BackgroundWidth * 2)
+				list1.remove(0);
+				list1.add( list1.get(list1.size() - 1) + level1BackgroundWidth );
+		}
+		
+		for (int i = 0; i < list1.size(); i++)
+			batch.draw(level1Background, list1.get(i), 0);
+	}
 	@Override
 	public void dispose()
 	{
