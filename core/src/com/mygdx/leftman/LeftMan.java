@@ -37,6 +37,12 @@ public class LeftMan implements ApplicationListener
 	int actualHeight;
 	boolean isManInAir;
 	
+	/**
+	 * create()
+	 * 
+	 * Method that is called when instance of game is first created. Sets up camera, sprites, animations, background
+	 * and batch.
+	 */
 	@Override
 	public void create()
 	{
@@ -49,6 +55,12 @@ public class LeftMan implements ApplicationListener
 		configureCamera();
 	}
 	
+	/**
+	 * initMan()
+	 * 
+	 * Private method responsible for setting up the main character sprite and animation.
+	 * Also defines his starting position, walk speed, jump speed and sets the initial jump state to false (isMainInAir = false).
+	 */
 	private void initMan(){
 		manPosition = new Vector2(0, 0);
 		manVelocity = new Vector2(200, 0);
@@ -69,6 +81,14 @@ public class LeftMan implements ApplicationListener
 		walkingManAnimation = new Animation(0.05f, walkFrames);
 	}
 	
+	/**
+	 * initEnemy1()
+	 * 
+	 * Private method responsible for setting up the first enemy character sprite and animation.
+	 * Also defines his starting position and walk speed.).
+	 * 
+	 * Note that the frames are reversed so the enemy does not having a walking backwards animation (spriteSheet has images in wrong order).
+	 */
 	private void initEnemy1(){
 		enemy1 = new Texture(Gdx.files.internal("Turtles.png"));
 		enemy1Velocity = new Vector2(-200, 0);
@@ -84,16 +104,19 @@ public class LeftMan implements ApplicationListener
 			for (int j = 0; j < FRAME_COLS; j++)
 				walkFrames[index++] = tmpWalkDuck[i][j];
 	
-		TextureRegion[] reverseFrames = reverseArray(walkFrames);
-		
-		/*reverseFrames[0] = walkFrames[4];
-		reverseFrames[1] = walkFrames[3];
-		reverseFrames[2] = walkFrames[2];
-		reverseFrames[3] = walkFrames[1];
-		reverseFrames[4] = walkFrames[0];*/
-		walkingEnemy1 = new Animation(0.1f, reverseFrames);
+		ArrayUtils.reverse(walkFrames);
+		walkingEnemy1 = new Animation(0.1f, walkFrames);
 	}
 	
+	/**
+	 * render()
+	 * 
+	 * A method that is called everytime the screen is rendered - basically everytime a frame is created.
+	 * Includes the bulk of the game logic.
+	 * 
+	 * Important to take note of the Gdx.graphics.getDeltaTime() - this returns the amount of time passed between
+	 * the last render call in float format.
+	 */
 	@Override
 	public void render()
 	{        
@@ -165,14 +188,4 @@ public class LeftMan implements ApplicationListener
 	{
 	}
 	
-	private TextureRegion[] reverseArray(TextureRegion[] arrayToReverse){
-		TextureRegion[] reversedArray = new TextureRegion[arrayToReverse.length];
-		for (int i = arrayToReverse.length -1, j = 0; i > -1; i--, j++){
-			reversedArray[j] = arrayToReverse[i];
-			System.out.println("Counter: " + j);
-		}
-		
-		System.out.println(arrayToReverse.length + " ==* " + reversedArray.length);
-		return reversedArray;
-	}
 }
