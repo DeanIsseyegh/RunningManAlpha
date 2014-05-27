@@ -35,7 +35,7 @@ public class GameHUDManager {
 		
 		bossIncomingLabel = new Label("BOSS INCOMING!", fontStyle);
 		bossIncomingLabel.setFontScale(3);
-		bossIncomingLabel.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+		bossIncomingLabel.setPosition(Gdx.graphics.getWidth()/2 * 0.7f, Gdx.graphics.getHeight()/2);
 		
 		stage = new Stage();
 		stage.addActor(pointsLabel);

@@ -14,12 +14,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
-import com.mygdx.runningman.characters.Boss1;
-import com.mygdx.runningman.characters.Enemy1;
-import com.mygdx.runningman.characters.Enemy2;
-import com.mygdx.runningman.characters.IEnemy;
-import com.mygdx.runningman.characters.MainCharacter;
 import com.mygdx.runningman.worldobjects.IWorldObject;
+import com.mygdx.runningman.worldobjects.characters.Boss1;
+import com.mygdx.runningman.worldobjects.characters.Enemy1;
+import com.mygdx.runningman.worldobjects.characters.Enemy2;
+import com.mygdx.runningman.worldobjects.characters.IEnemy;
+import com.mygdx.runningman.worldobjects.characters.MainCharacter;
 
 public class RunningMan implements ApplicationListener
 {
@@ -36,7 +36,7 @@ public class RunningMan implements ApplicationListener
 	private OrthographicCamera camera;
 	
 	private IWorldObject mainChar;
-	private IWorldObject boss1;
+	private IEnemy boss1;
 	private ArrayList<IEnemy> enemy1Array;
 	private ArrayList<IEnemy> enemy2Array;
 	private float posOfLastEnemy1;
@@ -92,7 +92,7 @@ public class RunningMan implements ApplicationListener
 		enemy1Array = new ArrayList<IEnemy>();
 		
 		int randomInt = 250;
-		int numOfEnemy = 10;
+		int numOfEnemy = 1;
 		for (int i = 0; i < numOfEnemy; i++){
 			randomInt = RandomUtils.nextInt(randomInt, randomInt + 610) + 600; 
 			enemy1Array.add(new Enemy1(randomInt, mainChar));
@@ -104,7 +104,7 @@ public class RunningMan implements ApplicationListener
 		enemy2Array = new ArrayList<IEnemy>();
 		
 		int randomInt = 250;
-		int numOfEnemy = 10;
+		int numOfEnemy = 1;
 		for (int i = 0; i < numOfEnemy; i++){
 			randomInt = RandomUtils.nextInt(randomInt, randomInt + 600) + 600; 
 			enemy2Array.add(new Enemy2(randomInt));
@@ -166,7 +166,7 @@ public class RunningMan implements ApplicationListener
 
 		camera.translate(scrollSpeed * deltaTime, 0);
 		
-		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, this);
+		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, boss1, this);
 		
 		gameOverConditions();
 		
@@ -179,13 +179,16 @@ public class RunningMan implements ApplicationListener
 	
 	private void bossFightHandle(float deltaTime){
 		
-		if (mainChar.getX() + 1200 > posOfLastEnemy1 && mainChar.getX() + 1200> posOfLastEnemy2 && !isBossFight){
+		if (mainChar.getX() > posOfLastEnemy1 && mainChar.getX() > posOfLastEnemy2 && !isBossFight){
+			soundManager.stopLevel1Music();
+		}
+		
+		if (mainChar.getX() + -1200 > posOfLastEnemy1 && mainChar.getX() - 1600> posOfLastEnemy2 && !isBossFight){
 			gameHUDManager.showBossLabel();
 			isBossFight = true;
 			timeSinceBossStart = 0;
-			boss1 = new Boss1(mainChar.getX() + 1000);
+			boss1 = new Boss1(mainChar.getX() + 1000, this);
 	 	}	
-		
 		
 		if (isBossFight){
 			timeSinceBossStart += deltaTime;

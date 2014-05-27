@@ -13,7 +13,11 @@ public interface IWorldObject {
 	static final String BG1_IMAGE = "skybackground.png";
 	static final String MAIN_CHAR_WEAPON1 = "weapon1.png";
 	static final String BLOOD_SPLAT = "bloodsplat.png";
+	
 	static final String BOSS1_IMAGE = "BowserWalkingSpriteSheetFlipped.png";
+	static final String BOSS1_SHOOT = "Boss1Shooting.png";
+	static final String BOSS1_PROJECTILE = "Boss1Projectile1.png";
+	
 	
 	public void update(float deltaTime, SpriteBatch batch);
 	
