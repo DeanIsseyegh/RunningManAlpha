@@ -2,11 +2,12 @@ package com.mygdx.runningman.worldobjects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class AbstractWorldObject {
+public abstract class AbstractWorldObject implements IWorldObject {
 
 	protected Vector2 velocity;
 	protected Vector2 position;
@@ -36,5 +37,30 @@ public class AbstractWorldObject {
 				aniFrames[index++] = tmpAniFrames[i][j];
 		
 		return aniFrames;
+	}
+
+	@Override
+	public float getX() {
+		return position.x;
+	}
+
+	@Override
+	public float getY() {
+		return position.y;
+	}
+
+	@Override
+	public float getWidth() {
+		return width;
+	}
+
+	@Override
+	public float getHeight() {
+		return height;
+	}
+
+	@Override
+	public Rectangle getBoundingBox() {
+		return boundsBox;
 	}
 }

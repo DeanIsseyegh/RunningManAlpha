@@ -15,8 +15,10 @@ public class CollisionManager {
 		for (IEnemy e : enemy1Array){
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox()))
 				runningMan.setGameOver(true);
-			else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox()))
+			else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
 				e.kill();
+				runningMan.setPoints(runningMan.getPoints() + 200);
+			}
 		}
 		
 		for (IEnemy e : enemy2Array)

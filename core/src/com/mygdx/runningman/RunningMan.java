@@ -8,11 +8,13 @@ import org.apache.commons.lang3.RandomUtils;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
+import com.mygdx.runningman.characters.Boss1;
 import com.mygdx.runningman.characters.Enemy1;
 import com.mygdx.runningman.characters.Enemy2;
 import com.mygdx.runningman.characters.IEnemy;
@@ -21,7 +23,6 @@ import com.mygdx.runningman.worldobjects.IWorldObject;
 
 public class RunningMan implements ApplicationListener
 {
-	private static final String TAG = "RunningManActivity";
 	private static final String BG1_IMAGE = "skybackground.png";
 	
 	private Texture level1Background;
@@ -30,27 +31,32 @@ public class RunningMan implements ApplicationListener
 	
 	private SpriteBatch batch;
 	
+	private CollisionManager collisionManager;
+	
 	private OrthographicCamera camera;
 	
 	private IWorldObject mainChar;
-	private IEnemy enemy1;
-	ArrayList<IEnemy> enemy1Array;
-	private IEnemy enemy2;
-	ArrayList<IEnemy> enemy2Array;
+	private IWorldObject boss1;
+	private ArrayList<IEnemy> enemy1Array;
+	private ArrayList<IEnemy> enemy2Array;
+	private float posOfLastEnemy1;
+	private float posOfLastEnemy2;
 	
 	private float time;
 	private int actualScreenWidth;
 	private int actualScreenHeight;
 	private int scrollSpeed = 250;
-	private int points;
-	private BitmapFont bitFont;
+	private long points;
 	
 	private boolean leftScreenTouched = false;
 	private boolean rightScreenTouched = false;
 	
 	private boolean isGameOver = false;
+	private boolean isBossFight = false;
+	private float timeSinceBossStart;
 	
-	private CollisionManager collisionManager;
+	private GameHUDManager gameHUDManager;
+	private SoundManager soundManager;
 
 	/**
 	 * create()
@@ -62,8 +68,8 @@ public class RunningMan implements ApplicationListener
 	public void create()
 	{
 		isGameOver = false;
-		bitFont = new BitmapFont();
 		points = 0;
+		time = 0;
 		mainChar = new MainCharacter(scrollSpeed, this);
 		
 		initRandomEnemy1();
@@ -77,26 +83,33 @@ public class RunningMan implements ApplicationListener
 		
 		collisionManager = new CollisionManager();
 		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this)));
+		gameHUDManager = new GameHUDManager();
+		soundManager = new SoundManager();
+		soundManager.playLevel1Music();
 	}
 	
 	private void initRandomEnemy1(){
 		enemy1Array = new ArrayList<IEnemy>();
 		
 		int randomInt = 250;
-		for (int i = 0; i < 30; i++){
-			randomInt = RandomUtils.nextInt(randomInt, randomInt + 6100) + 600; 
-			enemy1Array.add(new Enemy1(randomInt));
+		int numOfEnemy = 10;
+		for (int i = 0; i < numOfEnemy; i++){
+			randomInt = RandomUtils.nextInt(randomInt, randomInt + 610) + 600; 
+			enemy1Array.add(new Enemy1(randomInt, mainChar));
 		}
+		posOfLastEnemy1 = enemy1Array.get(enemy1Array.size() - 1).getX();
 	}
 	
 	private void initRandomEnemy2(){
 		enemy2Array = new ArrayList<IEnemy>();
 		
-		int randomInt = 100;
-		for (int i = 0; i < 30; i++){
+		int randomInt = 250;
+		int numOfEnemy = 10;
+		for (int i = 0; i < numOfEnemy; i++){
 			randomInt = RandomUtils.nextInt(randomInt, randomInt + 600) + 600; 
 			enemy2Array.add(new Enemy2(randomInt));
 		}
+		posOfLastEnemy2 = enemy2Array.get(enemy2Array.size() - 1).getX();
 	}
 	
 	/**
@@ -131,7 +144,7 @@ public class RunningMan implements ApplicationListener
 	    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 	    
 	    float deltaTime = Gdx.graphics.getDeltaTime();
-	    time += Gdx.graphics.getDeltaTime();
+	    time += deltaTime;
 	    camera.update();
 	    batch.setProjectionMatrix(camera.combined);
 	    
@@ -143,18 +156,44 @@ public class RunningMan implements ApplicationListener
 	 	
 		for (IWorldObject e : enemy1Array)
 			e.update(deltaTime, batch);
+
 	 	for (IWorldObject e : enemy2Array)
 	 		e.update(deltaTime, batch);
+
+	 	bossFightHandle(deltaTime);
 	 	
-	 	points += 2 * time;
-	 	bitFont.draw(batch, "Points: " + points, camera.viewportWidth + mainChar.getX() - 100,  camera.viewportHeight);
 		batch.end();		
 
-		gameOverConditions();
 		camera.translate(scrollSpeed * deltaTime, 0);
 		
 		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, this);
+		
+		gameOverConditions();
+		
 		resetCustomControlState();
+		
+	 	points += deltaTime * 80;
+	 	gameHUDManager.getPointsLabel().setText("Points: " + points);
+	 	gameHUDManager.getStage().draw();
+	}
+	
+	private void bossFightHandle(float deltaTime){
+		
+		if (mainChar.getX() + 1200 > posOfLastEnemy1 && mainChar.getX() + 1200> posOfLastEnemy2 && !isBossFight){
+			gameHUDManager.showBossLabel();
+			isBossFight = true;
+			timeSinceBossStart = 0;
+			boss1 = new Boss1(mainChar.getX() + 1000);
+	 	}	
+		
+		
+		if (isBossFight){
+			timeSinceBossStart += deltaTime;
+			if (timeSinceBossStart > 4f)
+				gameHUDManager.removeBossLabel();
+			
+			boss1.update(deltaTime, batch);
+		}
 	}
 	
 	/**
@@ -164,7 +203,7 @@ public class RunningMan implements ApplicationListener
 	 * 
 	 */
 	private void resetCustomControlState(){
-		leftScreenTouched = false;
+		leftScreenTouched = false;	
 		rightScreenTouched = false;
 	}
 
@@ -222,6 +261,7 @@ public class RunningMan implements ApplicationListener
 	}
 	
 	private void resetGame(){
+		soundManager.stopLevel1Music();
 		configureCamera();
 		create();
 	}
@@ -233,26 +273,50 @@ public class RunningMan implements ApplicationListener
 	 * 
 	 */
 	private void gameOverConditions(){
-		if (isGameOver)
+		if (isGameOver){
+			soundManager.playDieSound();
 			resetGame();
+		}
+	}
+	
+	//GETTERS AND SETTERS
+	public long getPoints() {
+		return points;
+	}
+
+	public void setPoints(long points) {
+		this.points = points;
 	}
 	
 	public void setLeftScreenTouched(boolean leftScreenTouched) {
 		this.leftScreenTouched = leftScreenTouched;
 	}
+	
 	public boolean isLeftScreenTouched() {
 		return leftScreenTouched;
 	}
+	
 	public void setRightScreenTouched(boolean rightScreenTouched) {
 		this.rightScreenTouched = rightScreenTouched;
 	}
+	
 	public boolean isRightScreenTouched() {
 		return rightScreenTouched;
 	}
+	
 	public void setGameOver(boolean isGameOver) {
 		this.isGameOver = isGameOver;
 	}
+	
 	public CollisionManager getCollisionManager() {
 		return collisionManager;
+	}
+	
+	public GameHUDManager getGameHUD() {
+		return gameHUDManager;
+	}
+
+	public SoundManager getSoundManager() {
+		return soundManager;
 	}
 }

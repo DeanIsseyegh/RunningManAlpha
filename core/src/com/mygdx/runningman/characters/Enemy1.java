@@ -16,8 +16,9 @@ import com.mygdx.runningman.worldobjects.IWorldObject;
 public class Enemy1 extends AbstractWorldObject implements IEnemy {
 	
 	boolean isKilled = false;
+	private IWorldObject mainChar;
 	
-	public Enemy1(int posX){
+	public Enemy1(int posX, IWorldObject mainChar){
 		spriteSheet = new Texture(Gdx.files.internal(ENEMY1_IMAGE)); //actual 24px wide 37px high
 		velocity = new Vector2(-200, 0);
 		position = new Vector2(posX, 0);
@@ -29,50 +30,35 @@ public class Enemy1 extends AbstractWorldObject implements IEnemy {
 		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, spriteSheet);
 		ArrayUtils.reverse(aniFrames);
 		animation = new Animation(0.1f, aniFrames);
+		this.mainChar = mainChar;
 	}
 	
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		time += deltaTime;
-		if (isKilled)
+		if (isKilled){				
 			boundsBox.set(0,0,0,0);
-		else {
-			position.x += velocity.x * deltaTime;
+			position.y += velocity.y * deltaTime;
+		} else {
 			boundsBox.set(position.x , position.y, width, height);
-			batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
+			position.x += velocity.x * deltaTime;
+			position.y = mainChar.getY();
 		}
-	}
-
-	@Override
-	public float getX() {
-		return position.x;
-	}
-
-	@Override
-	public float getY() {
-		return position.y;
-	}
-
-	@Override
-	public float getWidth() {
-		return width;
-	}
-
-	@Override
-	public float getHeight() {
-		return height;
-	}
-
-	@Override
-	public Rectangle getBoundingBox() {
-		return boundsBox;
+		batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
+		
 	}
 
 	@Override
 	public void kill() {
 		isKilled = true;
 		boundsBox.set(0, 0, 0 ,0);
-		System.out.println("**KILLED");
+		spriteSheet = new Texture(Gdx.files.internal(BLOOD_SPLAT));
+		TextureRegion[] aniFrames = animateFromSpriteSheet(1, 1, spriteSheet);
+		animation = new Animation(0.1f, aniFrames);
+		width = 50 * 2;
+		height = 43 * 2;
+		velocity.x = 0;
+		velocity.y = -100;
 	}
 
 }

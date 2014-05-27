@@ -1,6 +1,7 @@
 package com.mygdx.runningman.characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,7 +14,7 @@ import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.MainCharWeapon1;
 
-public class MainCharacter extends AbstractWorldObject implements IWorldObject {
+public class MainCharacter extends AbstractWorldObject {
 	
 	private boolean isInAir;
 	private boolean isAttacking;
@@ -52,11 +53,15 @@ public class MainCharacter extends AbstractWorldObject implements IWorldObject {
 		if (runningMan.isLeftScreenTouched() && position.y <= 0  && time > 1){
 			isInAir = true;
 			velocity.y = 300;
+			runningMan.getGameHUD().lightUpJumpLabel();
+			runningMan.getSoundManager().playJumpSound();
 		} 
 		
-		if (runningMan.isRightScreenTouched() && lastSwordAttack > 2){
+		if (runningMan.isRightScreenTouched() && lastSwordAttack > 1.5f){
 			isAttacking = true;
 			lastSwordAttack = 0;
+			runningMan.getGameHUD().lightUpAttackLabel();
+			runningMan.getSoundManager().playAttackSound();
 		} 
 		
 		//If mainChar is in attack frame
@@ -66,11 +71,6 @@ public class MainCharacter extends AbstractWorldObject implements IWorldObject {
 			MainCharWeapon1 weapon1 = new MainCharWeapon1(position.x + width - 19, position.y + (height * 0.43f));
 			weapon1.update(deltaTime, batch);
 			runningMan.getCollisionManager().setWeapon1(weapon1);
-			
-			if (attackingTimeLength > 0.75f){
-				isAttacking = false;
-				attackingTimeLength = 0;
-			}
 		}
 		//If mainChar is jumping/in the air
 		if (isInAir){
@@ -88,38 +88,21 @@ public class MainCharacter extends AbstractWorldObject implements IWorldObject {
 		//Draw the mainChar
 		batch.draw(animation.getKeyFrame(animationTime, true), position.x , position.y, 156, 200); //78px wide, 100 tall, 8 empty pixels each side of him
 		
+		//Post check if man has been attacking for 0.75 seconds
+		if (attackingTimeLength > 0.75f){
+			isAttacking = false;
+			attackingTimeLength = 0;
+			runningMan.getGameHUD().returnAttackLabelToNormal();
+		}
+		
 		//Post check if man has landed - if so reset jumping state
 		if (position.y <= 0){
 			position.y = 0;
 			velocity.y = 0;
 			isInAir = false;
+			runningMan.getGameHUD().returnJumpLabelToNormal();
 		}
 		
-	}
-
-	@Override
-	public float getX() {
-		return position.x;
-	}
-
-	@Override
-	public float getY() {
-		return position.y;
-	}
-
-	@Override
-	public float getWidth() {
-		return width;
-	}
-
-	@Override
-	public float getHeight() {
-		return height;
-	}
-
-	@Override
-	public Rectangle getBoundingBox() {
-		return boundsBox;
 	}
 
 }

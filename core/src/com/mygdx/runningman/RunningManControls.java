@@ -1,12 +1,14 @@
 package com.mygdx.runningman;
 
-import com.badlogic.gdx.ApplicationListener;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 
 public class RunningManControls implements GestureListener{
 
 	RunningMan runningMan;
+	float midWayPoint = Gdx.graphics.getWidth()/2;
 	
 	public RunningManControls(RunningMan runningMan){
 		this.runningMan = runningMan;
@@ -20,10 +22,7 @@ public class RunningManControls implements GestureListener{
 
 	@Override
 	public boolean longPress(float posX, float arg1) {
-		if (posX < 900)
-			this.runningMan.setLeftScreenTouched(true);
-		else
-			this.runningMan.setRightScreenTouched(true);
+		handleControls(posX);
 		return false;
 	}
 
@@ -46,24 +45,14 @@ public class RunningManControls implements GestureListener{
 	}
 
 	@Override
-	public boolean tap(float posX, float posY, int consecutiveTaps, int unkown) {
-		System.out.println("****TAPPED**");
-		System.out.println("posX : " + posX);
-		
-		if (posX < 900)
-			this.runningMan.setLeftScreenTouched(true);
-		else
-			this.runningMan.setRightScreenTouched(true);
-		
+	public boolean tap(float posX, float posY, int consecutiveTaps, int button) {
+		handleControls(posX);
 		return false;
 	}
 
 	@Override
 	public boolean touchDown(float posX, float arg1, int arg2, int arg3) {
-		if (posX < 900)
-			this.runningMan.setLeftScreenTouched(true);
-		else
-			this.runningMan.setRightScreenTouched(true);
+		handleControls(posX);
 		return false;
 	}
 
@@ -73,4 +62,14 @@ public class RunningManControls implements GestureListener{
 		return false;
 	}
 
+	private void handleControls(float posX){
+		if (posX < midWayPoint){
+			runningMan.setLeftScreenTouched(true);
+			runningMan.getGameHUD().lightUpJumpLabel();
+			
+		} else {
+			runningMan.setRightScreenTouched(true);
+			runningMan.getGameHUD().lightUpAttackLabel();
+		}
+	}
 }
