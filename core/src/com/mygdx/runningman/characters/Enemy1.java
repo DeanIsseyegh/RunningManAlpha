@@ -10,13 +10,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.mygdx.runningman.worldobjects.AbstractWorldObject;
+import com.mygdx.runningman.worldobjects.IWorldObject;
 
-public class Enemy1 extends GenericCharacter implements ICharacter {
+public class Enemy1 extends AbstractWorldObject implements IEnemy {
 	
-	public Enemy1(){
+	boolean isKilled = false;
+	
+	public Enemy1(int posX){
 		spriteSheet = new Texture(Gdx.files.internal(ENEMY1_IMAGE)); //actual 24px wide 37px high
 		velocity = new Vector2(-200, 0);
-		position = new Vector2(1000, 0);
+		position = new Vector2(posX, 0);
 		boundsBox = new Rectangle();
 		width = 96;
 		height = 148;
@@ -30,10 +34,13 @@ public class Enemy1 extends GenericCharacter implements ICharacter {
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		time += deltaTime;
-		position.x += velocity.x * deltaTime;
-	//	boundsBox.set(position.x , position.y, width, height);
-		
-		batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
+		if (isKilled)
+			boundsBox.set(0,0,0,0);
+		else {
+			position.x += velocity.x * deltaTime;
+			boundsBox.set(position.x , position.y, width, height);
+			batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
+		}
 	}
 
 	@Override
@@ -59,6 +66,13 @@ public class Enemy1 extends GenericCharacter implements ICharacter {
 	@Override
 	public Rectangle getBoundingBox() {
 		return boundsBox;
+	}
+
+	@Override
+	public void kill() {
+		isKilled = true;
+		boundsBox.set(0, 0, 0 ,0);
+		System.out.println("**KILLED");
 	}
 
 }

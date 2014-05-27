@@ -1,4 +1,4 @@
-package com.mygdx.runningman.characters;
+package com.mygdx.runningman.worldobjects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -7,58 +7,57 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.runningman.worldobjects.AbstractWorldObject;
-import com.mygdx.runningman.worldobjects.IWorldObject;
 
-public class Enemy2 extends AbstractWorldObject implements IEnemy {
-
-	public Enemy2(int posX){
-		spriteSheet = new Texture(Gdx.files.internal(ENEMY2_IMAGE)); //Actual each sprite 33px wide, 3 empty on left side
-		position = new Vector2(posX, 0);
+public class MainCharWeapon1 extends AbstractWorldObject implements IWorldObject{
+	
+	public MainCharWeapon1(float x, float y){
+		spriteSheet = new Texture(Gdx.files.internal(MAIN_CHAR_WEAPON1));
+		position = new Vector2(x, y);
 		boundsBox = new Rectangle();
-		width = 99; //3x stretch
-		height = 90; //3x stretch
-		int FRAME_COLS = 3;
+		velocity = new Vector2(600, 0);
+		width = 114;
+		height = 32;
+		int FRAME_COLS = 1;
 		int FRAME_ROWS = 1;
 		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, spriteSheet);
-		animation = new Animation(0.4f, aniFrames);
+		animation = new Animation(0.1f, aniFrames);
 	}
-	
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		time += deltaTime;
+		position.x += velocity.x * deltaTime;
+		boundsBox.set(position.x , position.y, width, height);
 		batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
-		boundsBox.set(position.x + 6, position.y, width, height);
 	}
 
 	@Override
 	public float getX() {
+		// TODO Auto-generated method stub
 		return position.x;
 	}
 
 	@Override
 	public float getY() {
+		// TODO Auto-generated method stub
 		return position.y;
 	}
 
 	@Override
 	public float getWidth() {
+		// TODO Auto-generated method stub
 		return width;
 	}
 
 	@Override
 	public float getHeight() {
+		// TODO Auto-generated method stub
 		return height;
 	}
 
 	@Override
 	public Rectangle getBoundingBox() {
+		// TODO Auto-generated method stub
 		return boundsBox;
-	}
-
-	@Override
-	public void kill() {
-		//Cannot be killed?
 	}
 
 }
