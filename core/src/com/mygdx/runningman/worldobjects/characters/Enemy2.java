@@ -32,13 +32,12 @@ public class Enemy2 extends AbstractWorldObject implements IEnemy {
 
 	@Override
 	public void kill() {
-		//Cannot be killed?
+		//Cannot be killed.
 	}
 
 	@Override
 	public void loseHealth() {
-		// TODO Auto-generated method stub
-		
+		//Cannot lose health.
 	}
 
 }

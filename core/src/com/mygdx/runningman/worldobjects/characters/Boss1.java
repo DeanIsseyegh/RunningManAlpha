@@ -9,7 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.runningman.RunningMan;
+import com.mygdx.runningman.AbstractRunningManListener;
+import com.mygdx.runningman.RunningManLevel1;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.projectiles.AbstractProjectile;
 import com.mygdx.runningman.worldobjects.projectiles.BloodSplatProjectile;
@@ -17,7 +18,7 @@ import com.mygdx.runningman.worldobjects.projectiles.Boss1Projectile;
 
 public class Boss1 extends AbstractWorldObject implements IEnemy {
 
-	private RunningMan runningMan;
+	private AbstractRunningManListener runningMan;
 	
 	private Animation walkingAnimation;
 	private Animation shootAnimation;
@@ -58,7 +59,7 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 	
 	private int currentBossHealth;
 	
-	public Boss1(float posX, RunningMan runningMan){
+	public Boss1(float posX, AbstractRunningManListener runningMan){
 		super(BOSS1_IMAGE);
 		runningMan.getSoundManager().initBoss1Resources();
 		this.runningMan = runningMan;

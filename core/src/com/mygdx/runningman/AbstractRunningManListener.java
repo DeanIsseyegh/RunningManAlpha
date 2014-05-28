@@ -6,7 +6,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import org.apache.commons.lang3.RandomUtils;
 
-import android.graphics.Matrix;
 import android.util.Log;
 
 import com.badlogic.gdx.ApplicationListener;
@@ -15,40 +14,40 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.mygdx.runningman.worldobjects.AbstractWorldObject;
+import com.mygdx.runningman.managers.BossFightManager;
+import com.mygdx.runningman.managers.CollisionManager;
+import com.mygdx.runningman.managers.GameHUDManager;
+import com.mygdx.runningman.managers.RunningManControls;
+import com.mygdx.runningman.managers.SoundManager;
 import com.mygdx.runningman.worldobjects.IWorldObject;
-import com.mygdx.runningman.worldobjects.characters.Boss1;
 import com.mygdx.runningman.worldobjects.characters.Enemy1;
 import com.mygdx.runningman.worldobjects.characters.Enemy2;
+import com.mygdx.runningman.worldobjects.characters.Enemy3;
+import com.mygdx.runningman.worldobjects.characters.Enemy4;
 import com.mygdx.runningman.worldobjects.characters.IEnemy;
 import com.mygdx.runningman.worldobjects.characters.MainCharacter;
 
-public class RunningMan implements ApplicationListener
+public abstract class AbstractRunningManListener implements ApplicationListener
 {
-	private static final String TAG = "MyLog";
-	private static final String BG1_IMAGE = "skybackground.png";
+	public static final String TAG = "MyLog";
 	
-	private Texture level1Background;
-	private final int level1BackgroundWidth = 1200;
+	private Texture background;
+	protected int backgroundWidth;
 	private ArrayList<Integer> backgroundPositions; 
 	
 	private SpriteBatch batch;
 	
 	private OrthographicCamera camera;
 	
-	private IWorldObject mainChar;
-	private IEnemy boss1;
-	private ArrayList<IEnemy> enemy1Array;
-	private ArrayList<IEnemy> enemy2Array;
-	private float posOfLastEnemy1;
-	private float posOfLastEnemy2;
+	protected IWorldObject mainChar;
+	protected float posOfLastEnemy;
+	protected ArrayList<IWorldObject> arrayOfCharacters;
 	
 	private float time;
 	private int actualScreenWidth;
 	private int actualScreenHeight;
-	private int scrollSpeed = 250;
+	protected int scrollSpeed = 250;
+
 	private long points;
 	
 	private boolean leftScreenTouched = false;
@@ -56,10 +55,10 @@ public class RunningMan implements ApplicationListener
 	
 	private boolean isGameOver = false;
 	
-	private CollisionManager collisionManager;
-	private GameHUDManager gameHUDManager;
-	private SoundManager soundManager;
-	private BossFightManager bossFightManager;
+	protected CollisionManager collisionManager;
+	protected GameHUDManager gameHUDManager;
+	protected SoundManager soundManager;
+	protected BossFightManager bossFightManager;
 
 	/**
 	 * create()
@@ -70,14 +69,14 @@ public class RunningMan implements ApplicationListener
 	@Override
 	public void create()
 	{
+		Log.v(TAG, "Game created. . .");
 		isGameOver = false;
 		points = 0;
 		time = 0;
-		mainChar = new MainCharacter(scrollSpeed, this);
 		
-		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, 1, 600, 700);
-		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, 1, 600, 700);
-		initBackground();
+		mainChar = new MainCharacter(scrollSpeed, this);
+		arrayOfCharacters = new ArrayList<IWorldObject>();
+		arrayOfCharacters.add(mainChar);
 		
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
@@ -85,12 +84,10 @@ public class RunningMan implements ApplicationListener
 		configureCamera();
 		
 		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this))); //setup custom controls
-		collisionManager = new CollisionManager();
+		collisionManager = new CollisionManager(this, mainChar);
+		bossFightManager = new BossFightManager(this, mainChar);
 		gameHUDManager = new GameHUDManager();
 		soundManager = new SoundManager();
-		bossFightManager = new BossFightManager(this, posOfLastEnemy1, posOfLastEnemy1, mainChar);
-		
-		soundManager.playLevel1Music();
 	}
 	
 	
@@ -101,12 +98,14 @@ public class RunningMan implements ApplicationListener
 	 * based on a RandomUtils.nextInt call.
 	 * 
 	 */
-	private ArrayList<IEnemy> initRandomEnemies(String typeOfEnemy, int numOfEnemy, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies){
+	protected ArrayList<IEnemy> initRandomEnemies(String typeOfEnemy, int numOfEnemy, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies){
 		ArrayList<IEnemy> arrayOfEnemies = new ArrayList<IEnemy>();
-		int randomInt = 50;
+		int randomInt = 150;
 		
 		boolean isEnemy1 = (typeOfEnemy.equals(IWorldObject.ENEMY1));
 		boolean isEnemy2 = (typeOfEnemy.equals(IWorldObject.ENEMY2));
+		boolean isEnemy3 = (typeOfEnemy.equals(IWorldObject.ENEMY3));
+		boolean isEnemy4 = (typeOfEnemy.equals(IWorldObject.ENEMY4));
 		
 		for (int i = 0; i < numOfEnemy; i++){
 			randomInt = RandomUtils.nextInt(randomInt, randomInt + possibleMaxDistBetweenEnemies) + minDistBetweenEnemies; 
@@ -114,11 +113,14 @@ public class RunningMan implements ApplicationListener
 				arrayOfEnemies.add(new Enemy1(randomInt, mainChar));
 			else if (isEnemy2)
 				arrayOfEnemies.add(new Enemy2(randomInt));
+			else if (isEnemy3)
+				arrayOfEnemies.add(new Enemy3(randomInt));
+			else if (isEnemy4)
+				arrayOfEnemies.add(new Enemy4(randomInt));
 		}
 		
-		if (isEnemy1) posOfLastEnemy1 = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
-		else if (isEnemy2) posOfLastEnemy2 = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
-		
+		posOfLastEnemy = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
+		bossFightManager.setPosOfLastEnemy(posOfLastEnemy);
 		return arrayOfEnemies;
 	}
 
@@ -131,12 +133,12 @@ public class RunningMan implements ApplicationListener
 	 * of X. X = Widths of background in pixels
 	 * 
 	 */
-	private void initBackground(){
-		level1Background = new Texture(Gdx.files.internal(BG1_IMAGE));
+	protected void initBackground(String backgroundImagePath, int backgroundWidth){
+		background = new Texture(Gdx.files.internal(backgroundImagePath));
 		backgroundPositions = new ArrayList<Integer>(); 
 		
 		for (int i = 0; i < 4; i++)
-			backgroundPositions.add(level1BackgroundWidth * i);
+			backgroundPositions.add(backgroundWidth * i);
 	}
 	
 	/**
@@ -161,14 +163,9 @@ public class RunningMan implements ApplicationListener
 		    
 		batch.begin(); 
 		 	
-		renderInfiniteBackground();
-			
-		mainChar.update(deltaTime, batch);
-		 	
-		for (IWorldObject e : enemy1Array)
-			e.update(deltaTime, batch);
+		renderInfiniteBackground(batch);
 	
-		for (IWorldObject e : enemy2Array)
+		for (IWorldObject e : arrayOfCharacters)
 		 	e.update(deltaTime, batch);
 	
 		bossFightManager.handle(deltaTime, batch);
@@ -176,11 +173,9 @@ public class RunningMan implements ApplicationListener
 		batch.end();		
 	
 		camera.translate(scrollSpeed * deltaTime, 0);
-			
-		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, this);
-			
+		
+		collisionManager.handleCollisions();
 		gameOverConditions();
-			
 		resetCustomControlState();
 			
 		points += deltaTime * 80;
@@ -209,31 +204,39 @@ public class RunningMan implements ApplicationListener
 	 * on performance. This method means only 4 backgrounds will be rendered at a given time!
 	 * 
 	 */
-	private void renderInfiniteBackground(){
-		if (mainChar.getX() > backgroundPositions.get(0) + level1BackgroundWidth && backgroundPositions.get(0) != 0){
+	private void renderInfiniteBackground(SpriteBatch batch){
+		if (mainChar.getX() > backgroundPositions.get(0) + backgroundWidth && backgroundPositions.get(0) != 0){
 			backgroundPositions.remove(0);
-			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + level1BackgroundWidth );
+			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + backgroundWidth );
 		} else if (backgroundPositions.get(0) == 0 
-					&& mainChar.getX() > level1BackgroundWidth * 2) {
+					&& mainChar.getX() > backgroundWidth * 2) {
 			backgroundPositions.remove(0);
-			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + level1BackgroundWidth );
+			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + backgroundWidth );
 		}
 		
 		for (int i = 0; i < backgroundPositions.size(); i++)
-			batch.draw(level1Background, backgroundPositions.get(i), 0);
+			batch.draw(background, backgroundPositions.get(i), 0);
 	}
 	
 	@Override
-	public void dispose(){}
+	public void dispose(){
+		Log.v(TAG, "Gametime: " + time + " Game disposed. . .");
+	}
 
 	@Override
-	public void resize(int width, int height){}
+	public void resize(int width, int height){
+		Log.v(TAG, "Gametime: " + time + " Game resized. . . ");
+	}
 
 	@Override
-	public void pause(){}
+	public void pause(){
+		Log.v(TAG, "Gametime: " + time + " Game paused. . .");
+	}
 
 	@Override
-	public void resume(){}
+	public void resume(){
+		Log.v(TAG, "Gametime: " + time + " Game resumed. . .");
+	}
 	
 	/**
 	 * configureCamera()
@@ -314,5 +317,13 @@ public class RunningMan implements ApplicationListener
 
 	public BossFightManager getBossFightManager() {
 		return bossFightManager;
+	}
+	
+	public int getScrollSpeed() {
+		return scrollSpeed;
+	}
+
+	public void setScrollSpeed(int scrollSpeed) {
+		this.scrollSpeed = scrollSpeed;
 	}
 }

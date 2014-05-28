@@ -8,8 +8,11 @@ public interface IWorldObject {
 	static final String TAG = "MyActivity";
 	static final String ENEMY1 = "Enemy1";
 	static final String ENEMY2 = "Enemy2";
+	static final String ENEMY3 = "Enemy3";
+	static final String ENEMY4 = "Enemy4";
 	
 	static final String BG1_IMAGE = "skybackground.png";
+	static final int BG1_WIDTH = 1200;
 	
 	static final String MAIN_CHAR_IMAGE = "adjustedMan.png";
 	static final String MAIN_CHAR_WEAPON1 = "weapon1.png";

@@ -1,19 +1,21 @@
-package com.mygdx.runningman;
+package com.mygdx.runningman.managers;
 
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.runningman.AbstractRunningManListener;
+import com.mygdx.runningman.RunningManLevel1;
 
 public class RunningManControls implements GestureListener{
 
-	RunningMan runningMan;
+	AbstractRunningManListener runningMan;
 	float midWayPoint = Gdx.graphics.getWidth()/2;
 	
-	public RunningManControls(RunningMan runningMan){
+	public RunningManControls(AbstractRunningManListener runningMan){
 		this.runningMan = runningMan;
 	}
-	
+
 	@Override
 	public boolean fling(float arg0, float arg1, int arg2) {
 		// TODO Auto-generated method stub

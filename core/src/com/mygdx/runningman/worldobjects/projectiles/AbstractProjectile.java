@@ -13,9 +13,15 @@ public abstract class AbstractProjectile extends AbstractWorldObject implements 
 		super(spriteSheetPath);
 	}
 	
-	public void reflect(){ 
+	/**
+	 * If a projectile is reflected it will invert its speed speed/slow it up
+	 * by the additionalSpeed parameter taken in.
+	 * 
+	 * @param additionalSpeed
+	 */
+	public void reflect(int additionalSpeed){ 
 		if (!isReflected){
-			velocity.x = -velocity.x + 600;
+			velocity.x = -velocity.x + additionalSpeed;
 			velocity.y = -velocity.y;
 			isReflected = true;
 		}
@@ -29,6 +35,11 @@ public abstract class AbstractProjectile extends AbstractWorldObject implements 
 		this.isReflected = isReflected;
 	}
 	
+	/**
+	 * Ensures that the projectile does not interact with anything else. Note that
+	 * the projectile should be set to null outside of this method to properly destroy itself,
+	 * but this provides some defensive coding.
+	 */
 	public void destroy(){
 		position.x = -1;
 		position.y = -1;

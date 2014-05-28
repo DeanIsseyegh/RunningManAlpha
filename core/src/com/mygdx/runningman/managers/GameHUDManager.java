@@ -1,4 +1,4 @@
-package com.mygdx.runningman;
+package com.mygdx.runningman.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

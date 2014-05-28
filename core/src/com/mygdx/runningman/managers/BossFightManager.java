@@ -1,7 +1,9 @@
-package com.mygdx.runningman;
+package com.mygdx.runningman.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.runningman.AbstractRunningManListener;
+import com.mygdx.runningman.RunningManLevel1;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.Boss1;
@@ -12,27 +14,29 @@ public class BossFightManager {
 	private IWorldObject mainChar;
 	private IEnemy boss1;
 
-	private RunningMan runningMan;
+	private AbstractRunningManListener runningMan;
 	private BossManagerState bossState;
 	
 	private float timeSinceBossStart;
-	private float posOfLastEnemy1;
-	private float posOfLastEnemy2;
-	
+	private float posOfLastEnemy;
+
 	private boolean isBoss1Dead;
 	private boolean isBoss2Dead;
 	
-	public BossFightManager(RunningMan runningMan, float posOfLastEnemy1, float posOfLastEnemy2, IWorldObject mainChar){
+	public BossFightManager(AbstractRunningManListener runningMan, IWorldObject mainChar){
 		this.runningMan = runningMan;
-		this.posOfLastEnemy1 = posOfLastEnemy1;
-		this.posOfLastEnemy2 = posOfLastEnemy2;
 		this.mainChar = mainChar;
 	
 		bossState = BossManagerState.NoBossFight;
 	}
-	
+
+	/**
+	 * Handle boss states and what occurs during them. Note that switch statement takes in BossManagerState enums.
+	 * 
+	 * @param deltaTime
+	 * @param batch
+	 */
 	public void handle(float deltaTime, SpriteBatch batch){
-		
 		switch(bossState){
 		
 			case NoBossFight: 
@@ -45,7 +49,6 @@ public class BossFightManager {
 				
 			default: break;
 		}	
-		
 	}
 	
 	public enum BossManagerState{
@@ -53,32 +56,43 @@ public class BossFightManager {
 		BossFight1,
 		BossFight2;
 	}
-	
+	/**
+	 * Handles the no boss state - will trigger boss fights (basically set state to a bossfight) if certain
+	 * conditions are met.
+	 */
 	private void noBossFightLogic(){
-		if (mainChar.getX() > posOfLastEnemy1 
-				&& mainChar.getX() > posOfLastEnemy2 
+		if (mainChar.getX() > posOfLastEnemy
 				&& bossState == BossManagerState.NoBossFight
 				&& !isBoss1Dead){
 			runningMan.getSoundManager().stopLevel1Music();
 		}
 		
-		if (mainChar.getX() + -1200 > posOfLastEnemy1 
-				&& mainChar.getX() - 1600> posOfLastEnemy2 
+		if (mainChar.getX() > posOfLastEnemy + Gdx.graphics.getWidth()
 				&& !isBoss1Dead){
 			runningMan.getGameHUD().showBossLabel();
 			timeSinceBossStart = 0;
-			boss1 = new Boss1(mainChar.getX() + 1000, runningMan);
 			
+			boss1 = new Boss1(mainChar.getX() + 1000, runningMan);
 			bossState = BossManagerState.BossFight1;
 	 	}	
 	}
 	
+	/**
+	 * Handles the first boss fight conditions. Adds/removes the
+	 * "Boss Incoming" label and handles music resources.
+	 * 
+	 * Also sets boss1 to null when boss fight is over.
+	 * 
+	 * @param deltaTime
+	 * @param batch
+	 */
 	private void bossFight1Logic(float deltaTime, SpriteBatch batch){
 		timeSinceBossStart += deltaTime;
 		if (timeSinceBossStart > 4f)
 			runningMan.getGameHUD().removeBossLabel();
 			
 		boss1.update(deltaTime, batch);
+		
 		if (boss1.getX() > mainChar.getX() + Gdx.graphics.getWidth() + (Gdx.graphics.getWidth() * 0.05f)){
 			boss1 = null;
 			runningMan.getSoundManager().destroyBoss1Resources();
@@ -92,4 +106,7 @@ public class BossFightManager {
 		return boss1;
 	}
 	
+	public void setPosOfLastEnemy(float posOfLastEnemy) {
+		this.posOfLastEnemy = posOfLastEnemy;
+	}
 }

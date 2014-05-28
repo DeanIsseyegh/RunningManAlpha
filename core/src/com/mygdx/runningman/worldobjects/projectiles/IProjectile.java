@@ -2,7 +2,7 @@ package com.mygdx.runningman.worldobjects.projectiles;
 
 public interface IProjectile {
 	
-	public void reflect();
+	public void reflect(int additionalSpeed);
 
 	public boolean isReflected();
 

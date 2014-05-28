@@ -1,5 +1,7 @@
 package com.mygdx.runningman.worldobjects.characters;
 
+import android.util.Log;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,7 +11,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.runningman.RunningMan;
+import com.mygdx.runningman.AbstractRunningManListener;
+import com.mygdx.runningman.RunningManLevel1;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.projectiles.MainCharWeapon1;
@@ -19,13 +22,14 @@ public class MainCharacter extends AbstractWorldObject {
 	private boolean isInAir;
 	private boolean isAttacking;
 	private int hardCodedJumpHeight = 175;
+	private float timeAllowedBetweenAttacks = 1.25f;
 	
 	private float animationTime;
 	private float lastSwordAttack;
 	private float attackingTimeLength;
-	private RunningMan runningMan;
+	private AbstractRunningManListener runningMan;
 
-	public MainCharacter(int scrollSpeed, RunningMan runningMan){
+	public MainCharacter(int scrollSpeed, AbstractRunningManListener runningMan){
 		super(MAIN_CHAR_IMAGE); //608 x 240 pixels - 8 COLS, 2 ROWS
 		width = 125;
 		height = 200;
@@ -41,7 +45,7 @@ public class MainCharacter extends AbstractWorldObject {
 		this.runningMan = runningMan;
 		lastSwordAttack = 2;
 	}
-	
+
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		time += deltaTime;
@@ -56,7 +60,7 @@ public class MainCharacter extends AbstractWorldObject {
 			runningMan.getSoundManager().playJumpSound();
 		} 
 		
-		if (runningMan.isRightScreenTouched() && lastSwordAttack > 1.25f){
+		if (runningMan.isRightScreenTouched() && lastSwordAttack > timeAllowedBetweenAttacks){
 			isAttacking = true;
 			lastSwordAttack = 0;
 			runningMan.getGameHUD().lightUpAttackLabel();
