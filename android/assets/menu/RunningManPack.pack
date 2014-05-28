@@ -1,0 +1,33 @@
+
+RunningManPack.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+StartGameButton
+  rotate: false
+  xy: 1, 289
+  size: 589, 94
+  orig: 589, 94
+  offset: 0, 0
+  index: -1
+StartGameButtonPressed
+  rotate: false
+  xy: 1, 193
+  size: 589, 94
+  orig: 589, 94
+  offset: 0, 0
+  index: -1
+ExitGameButton
+  rotate: false
+  xy: 1, 97
+  size: 516, 94
+  orig: 516, 94
+  offset: 0, 0
+  index: -1
+ExitGameButtonPressed
+  rotate: false
+  xy: 1, 1
+  size: 516, 94
+  orig: 516, 94
+  offset: 0, 0
+  index: -1

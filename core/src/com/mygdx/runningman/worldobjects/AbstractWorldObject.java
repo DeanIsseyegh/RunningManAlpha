@@ -71,7 +71,7 @@ public abstract class AbstractWorldObject implements IWorldObject {
 	 * @param Texture spriteSheet - The Texture object containing the spriteSheet
 	 * @return
 	 */
-	protected TextureRegion[] animateFromSpriteSheet(int cols, int rows, Texture spriteSheet){
+	public static TextureRegion[] animateFromSpriteSheet(int cols, int rows, Texture spriteSheet){
 		TextureRegion[][] tmpAniFrames = TextureRegion.split(spriteSheet, spriteSheet.getWidth() / cols, spriteSheet.getHeight() / rows);
 		TextureRegion[] aniFrames = new TextureRegion[cols * rows];
 		

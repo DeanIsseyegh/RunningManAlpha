@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,8 +27,9 @@ import com.mygdx.runningman.worldobjects.characters.Enemy3;
 import com.mygdx.runningman.worldobjects.characters.Enemy4;
 import com.mygdx.runningman.worldobjects.characters.IEnemy;
 import com.mygdx.runningman.worldobjects.characters.MainCharacter;
+import com.mygdx.runningman.worldobjects.characters.npc.Bird1;
 
-public abstract class AbstractRunningManListener implements ApplicationListener
+public abstract class AbstractRunningManListener implements Screen
 {
 	public static final String TAG = "MyLog";
 	
@@ -45,7 +47,7 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	
 	private float time;
 	private int actualScreenWidth;
-	private int actualScreenHeight;
+	private int actualScreenHeight = 800;
 	protected int scrollSpeed = 250;
 
 	private long points;
@@ -60,14 +62,21 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	protected SoundManager soundManager;
 	protected BossFightManager bossFightManager;
 
+	private MainGame game;
+	
+	public AbstractRunningManListener(MainGame game, SoundManager soundManager){
+		this.game = game;
+		this.soundManager = soundManager;
+	}
+	
 	/**
-	 * create()
+	 * show()
 	 * 
 	 * Method that is called when instance of game is first created. Sets up camera, sprites, animations, background
 	 * and batch.
 	 */
 	@Override
-	public void create()
+	public void show()
 	{
 		Log.v(TAG, "Game created. . .");
 		isGameOver = false;
@@ -80,14 +89,12 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 		
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
-		actualScreenHeight = 800;
 		configureCamera();
 		
 		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this))); //setup custom controls
 		collisionManager = new CollisionManager(this, mainChar);
 		bossFightManager = new BossFightManager(this, mainChar);
 		gameHUDManager = new GameHUDManager();
-		soundManager = new SoundManager();
 	}
 	
 	
@@ -98,9 +105,9 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	 * based on a RandomUtils.nextInt call.
 	 * 
 	 */
-	protected ArrayList<IEnemy> initRandomEnemies(String typeOfEnemy, int numOfEnemy, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies){
+	protected ArrayList<IEnemy> initRandomEnemies(String typeOfEnemy, int numOfEnemy, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies, int initialStartingMinDistance){
 		ArrayList<IEnemy> arrayOfEnemies = new ArrayList<IEnemy>();
-		int randomInt = 150;
+		int randomInt = initialStartingMinDistance;
 		
 		boolean isEnemy1 = (typeOfEnemy.equals(IWorldObject.ENEMY1));
 		boolean isEnemy2 = (typeOfEnemy.equals(IWorldObject.ENEMY2));
@@ -119,11 +126,26 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 				arrayOfEnemies.add(new Enemy4(randomInt));
 		}
 		
-		posOfLastEnemy = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
+		
+		if (!isEnemy1) posOfLastEnemy = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
 		bossFightManager.setPosOfLastEnemy(posOfLastEnemy);
 		return arrayOfEnemies;
 	}
-
+	
+	protected ArrayList<IWorldObject> initRandomCharacters(String typeOfChar, int numOfChars, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies, int initialStartingMinDistance){
+		int randomInt = initialStartingMinDistance;
+		ArrayList<IWorldObject> arrayOfChars = new ArrayList<IWorldObject>();
+		
+		boolean isBird1 = (typeOfChar.equals(IWorldObject.BIRD1));
+		
+		for (int i = 0; i < numOfChars; i++){
+			randomInt = RandomUtils.nextInt(randomInt, randomInt + possibleMaxDistBetweenEnemies) + minDistBetweenEnemies; 
+			if (isBird1)
+				arrayOfChars.add(new Bird1(randomInt));
+		}
+		
+		return arrayOfChars;
+	}
 	
 	/**
 	 * initBackground()
@@ -149,14 +171,15 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	 * 
 	 * Important to take note of the Gdx.graphics.getDeltaTime() - this returns the amount of time passed between
 	 * the last render call in float format.
+	 * 
+	 * @param deltaTime - time between each call of this method
 	 */
 	@Override
-	public void render()
+	public void render(float deltaTime)
 	{        
 	    Gdx.gl.glClearColor(0, 159, 205, 0);
 	    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-	    float deltaTime = Gdx.graphics.getDeltaTime();
 	    time += deltaTime;
 	    camera.update();
 		batch.setProjectionMatrix(camera.combined);
@@ -219,9 +242,7 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	}
 	
 	@Override
-	public void dispose(){
-		Log.v(TAG, "Gametime: " + time + " Game disposed. . .");
-	}
+	public void dispose(){}
 
 	@Override
 	public void resize(int width, int height){
@@ -236,6 +257,13 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	@Override
 	public void resume(){
 		Log.v(TAG, "Gametime: " + time + " Game resumed. . .");
+	}
+	
+	@Override
+	public void hide(){
+		Log.v(TAG, "Gametime: " + time + " Game hiding. . .");
+		batch.dispose();
+		background.dispose();
 	}
 	
 	/**
@@ -257,7 +285,7 @@ public abstract class AbstractRunningManListener implements ApplicationListener
 	private void resetGame(){
 		soundManager.stopLevel1Music();
 		configureCamera();
-		create();
+		game.setScreen(game.mainMenu);
 	}
 	
 	/**

@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 
 public class SoundManager {
 	
+	private static final String MAINMENU_MUSIC = "music/MainMenuMusic.wav";
 	private static final String LEVEL1_MUSIC = "music/Level1Music.mp3";
 	private static final String BOSS1_MUSIC = "music/Boss1Music.mp3";
 	
@@ -19,7 +20,7 @@ public class SoundManager {
 	private static final String BOSS1_RAGE = "music/Boss1Rage.wav";
 	private static final String BOSS1_DEATH = "music/Boss1Death.ogg";
 	
-	
+	private Music mainMenuMusic;
 	private Music level1Music;
 	private Music boss1Music;
 	
@@ -37,6 +38,21 @@ public class SoundManager {
 		jumpSound = Gdx.audio.newSound(Gdx.files.internal(JUMP_SOUND));
 		attackSound = Gdx.audio.newSound(Gdx.files.internal(ATTACK_SOUND));
 		dieSound = Gdx.audio.newSound(Gdx.files.internal(DIE_SOUND));
+	}
+	
+	public void playMainMenuMusic(){
+		if (mainMenuMusic == null)
+			mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal(MAINMENU_MUSIC));
+		mainMenuMusic.setVolume(0.25f);
+		mainMenuMusic.play();
+	}
+	
+	public void stopMainMenuMusic(){
+		if (mainMenuMusic != null){
+			mainMenuMusic.stop();
+			mainMenuMusic.dispose();
+			mainMenuMusic = null;
+		}
 	}
 	
 	public void playLevel1Music(){

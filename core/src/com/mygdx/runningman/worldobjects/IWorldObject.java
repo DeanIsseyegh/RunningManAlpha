@@ -10,6 +10,7 @@ public interface IWorldObject {
 	static final String ENEMY2 = "Enemy2";
 	static final String ENEMY3 = "Enemy3";
 	static final String ENEMY4 = "Enemy4";
+	static final String BIRD1 = "Bird1";
 	
 	static final String BG1_IMAGE = "skybackground.png";
 	static final int BG1_WIDTH = 1200;
@@ -26,6 +27,7 @@ public interface IWorldObject {
 	static final String BOSS1_DYING = "Boss1Dying.png";
 	
 	static final String BLOOD_SPLAT = "bloodsplat.png";
+	static final String BIRD1_IMAGE = "Bird1.png";
 	
 	public void update(float deltaTime, SpriteBatch batch);
 	
