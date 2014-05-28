@@ -6,14 +6,17 @@ import javax.microedition.khronos.opengles.GL10;
 
 import org.apache.commons.lang3.RandomUtils;
 
+import android.graphics.Matrix;
+import android.util.Log;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.Boss1;
 import com.mygdx.runningman.worldobjects.characters.Enemy1;
@@ -23,6 +26,7 @@ import com.mygdx.runningman.worldobjects.characters.MainCharacter;
 
 public class RunningMan implements ApplicationListener
 {
+	private static final String TAG = "MyLog";
 	private static final String BG1_IMAGE = "skybackground.png";
 	
 	private Texture level1Background;
@@ -53,6 +57,7 @@ public class RunningMan implements ApplicationListener
 	
 	private boolean isGameOver = false;
 	private boolean isBossFight = false;
+	private boolean isBoss1FightOver = false;
 	private float timeSinceBossStart;
 	
 	private GameHUDManager gameHUDManager;
@@ -72,8 +77,8 @@ public class RunningMan implements ApplicationListener
 		time = 0;
 		mainChar = new MainCharacter(scrollSpeed, this);
 		
-		initRandomEnemy1();
-		initRandomEnemy2();
+		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, 15, 600, 700);
+		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, 15, 600, 700);
 		initBackground();
 		
 		batch = new SpriteBatch();
@@ -88,29 +93,35 @@ public class RunningMan implements ApplicationListener
 		soundManager.playLevel1Music();
 	}
 	
-	private void initRandomEnemy1(){
-		enemy1Array = new ArrayList<IEnemy>();
-		
-		int randomInt = 250;
-		int numOfEnemy = 1;
-		for (int i = 0; i < numOfEnemy; i++){
-			randomInt = RandomUtils.nextInt(randomInt, randomInt + 610) + 600; 
-			enemy1Array.add(new Enemy1(randomInt, mainChar));
-		}
-		posOfLastEnemy1 = enemy1Array.get(enemy1Array.size() - 1).getX();
-	}
 	
-	private void initRandomEnemy2(){
-		enemy2Array = new ArrayList<IEnemy>();
+	/**
+	 * initRandomEnemy1()
+	 * 
+	 * Creates an array of enemies and will generate them at a random position
+	 * based on a RandomUtils.nextInt call.
+	 * 
+	 */
+	private ArrayList<IEnemy> initRandomEnemies(String typeOfEnemy, int numOfEnemy, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies){
+		ArrayList<IEnemy> arrayOfEnemies = new ArrayList<IEnemy>();
+		int randomInt = 50;
 		
-		int randomInt = 250;
-		int numOfEnemy = 1;
+		boolean isEnemy1 = (typeOfEnemy.equals(IWorldObject.ENEMY1));
+		boolean isEnemy2 = (typeOfEnemy.equals(IWorldObject.ENEMY2));
+		
 		for (int i = 0; i < numOfEnemy; i++){
-			randomInt = RandomUtils.nextInt(randomInt, randomInt + 600) + 600; 
-			enemy2Array.add(new Enemy2(randomInt));
+			randomInt = RandomUtils.nextInt(randomInt, randomInt + possibleMaxDistBetweenEnemies) + minDistBetweenEnemies; 
+			if (isEnemy1)
+				arrayOfEnemies.add(new Enemy1(randomInt, mainChar));
+			else if (isEnemy2)
+				arrayOfEnemies.add(new Enemy2(randomInt));
 		}
-		posOfLastEnemy2 = enemy2Array.get(enemy2Array.size() - 1).getX();
+		
+		if (isEnemy1) posOfLastEnemy1 = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
+		else if (isEnemy2) posOfLastEnemy2 = arrayOfEnemies.get(arrayOfEnemies.size() - 1).getX();
+		
+		return arrayOfEnemies;
 	}
+
 	
 	/**
 	 * initBackground()
@@ -142,60 +153,78 @@ public class RunningMan implements ApplicationListener
 	{        
 	    Gdx.gl.glClearColor(0, 159, 205, 0);
 	    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-	    
+
 	    float deltaTime = Gdx.graphics.getDeltaTime();
 	    time += deltaTime;
 	    camera.update();
-	    batch.setProjectionMatrix(camera.combined);
-	    
+		batch.setProjectionMatrix(camera.combined);
+		    
 		batch.begin(); 
-	 	
+		 	
 		renderInfiniteBackground();
-		
+			
 		mainChar.update(deltaTime, batch);
-	 	
+		 	
 		for (IWorldObject e : enemy1Array)
 			e.update(deltaTime, batch);
-
-	 	for (IWorldObject e : enemy2Array)
-	 		e.update(deltaTime, batch);
-
-	 	bossFightHandle(deltaTime);
-	 	
-		batch.end();		
-
-		camera.translate(scrollSpeed * deltaTime, 0);
-		
-		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, boss1, this);
-		
-		gameOverConditions();
-		
-		resetCustomControlState();
-		
-	 	points += deltaTime * 80;
-	 	gameHUDManager.getPointsLabel().setText("Points: " + points);
-	 	gameHUDManager.getStage().draw();
-	}
 	
+		for (IWorldObject e : enemy2Array)
+		 	e.update(deltaTime, batch);
+	
+		 bossFightHandle(deltaTime);
+		 	
+		batch.end();		
+	
+		camera.translate(scrollSpeed * deltaTime, 0);
+			
+		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, boss1, this);
+			
+		gameOverConditions();
+			
+		resetCustomControlState();
+			
+		points += deltaTime * 80;
+		gameHUDManager.getPointsLabel().setText("Points: " + points);
+		gameHUDManager.getStage().draw();
+	    
+	}
+	private Vector3 camPos;
+	
+	/**
+	 * bossFightHandle()
+	 * 
+	 * A helper method used to handle boss fights making sure they start and end under the right conditions. 
+	 * 
+	 */
 	private void bossFightHandle(float deltaTime){
 		
-		if (mainChar.getX() > posOfLastEnemy1 && mainChar.getX() > posOfLastEnemy2 && !isBossFight){
-			soundManager.stopLevel1Music();
-		}
-		
-		if (mainChar.getX() + -1200 > posOfLastEnemy1 && mainChar.getX() - 1600> posOfLastEnemy2 && !isBossFight){
-			gameHUDManager.showBossLabel();
-			isBossFight = true;
-			timeSinceBossStart = 0;
-			boss1 = new Boss1(mainChar.getX() + 1000, this);
-	 	}	
-		
-		if (isBossFight){
-			timeSinceBossStart += deltaTime;
-			if (timeSinceBossStart > 4f)
-				gameHUDManager.removeBossLabel();
+		if (!isBoss1FightOver){ //if the boss1 fight is not over/already happened.
 			
-			boss1.update(deltaTime, batch);
+			if (mainChar.getX() > posOfLastEnemy1 && mainChar.getX() > posOfLastEnemy2 && !isBossFight){
+				soundManager.stopLevel1Music();
+			}
+			
+			if (mainChar.getX() + -1200 > posOfLastEnemy1 && mainChar.getX() - 1600> posOfLastEnemy2 && !isBossFight){
+				gameHUDManager.showBossLabel();
+				isBossFight = true;
+				timeSinceBossStart = 0;
+				boss1 = new Boss1(mainChar.getX() + 1000, this);
+		 	}	
+			
+			if (isBossFight){
+				timeSinceBossStart += deltaTime;
+				if (timeSinceBossStart > 4f)
+					gameHUDManager.removeBossLabel();
+				
+				boss1.update(deltaTime, batch);
+				if (boss1.getX() > mainChar.getX() + Gdx.graphics.getWidth() + (Gdx.graphics.getWidth() * 0.15f)){
+					boss1 = null;
+					isBossFight = false;
+					isBoss1FightOver = true;
+					soundManager.destroyBoss1Resources();
+				}
+			}
+	
 		}
 	}
 	
@@ -232,27 +261,25 @@ public class RunningMan implements ApplicationListener
 		for (int i = 0; i < backgroundPositions.size(); i++)
 			batch.draw(level1Background, backgroundPositions.get(i), 0);
 	}
-	@Override
-	public void dispose()
-	{
-	}
 	
 	@Override
-	public void resize(int width, int height)
-	{
-		configureCamera();
-	}
+	public void dispose(){}
 
 	@Override
-	public void pause()
-	{
-	}
+	public void resize(int width, int height){}
 
 	@Override
-	public void resume()
-	{
-	}
+	public void pause(){}
+
+	@Override
+	public void resume(){}
 	
+	/**
+	 * configureCamera()
+	 * 
+	 * Ensures camera is the correct side up depending on how the user is holding the phone.
+	 * 
+	 */
 	private void configureCamera(){
 		if (Gdx.graphics.getHeight() < Gdx.graphics.getWidth()) {
 			actualScreenWidth = actualScreenHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
@@ -278,6 +305,7 @@ public class RunningMan implements ApplicationListener
 	private void gameOverConditions(){
 		if (isGameOver){
 			soundManager.playDieSound();
+			soundManager.destroyBoss1Resources();
 			resetGame();
 		}
 	}
@@ -322,4 +350,5 @@ public class RunningMan implements ApplicationListener
 	public SoundManager getSoundManager() {
 		return soundManager;
 	}
+	
 }

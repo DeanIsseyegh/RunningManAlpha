@@ -13,12 +13,12 @@ import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 
 public class Boss1Projectile extends AbstractProjectile{
 
-	public Boss1Projectile(float x, float y, float velocityY){
+	public Boss1Projectile(float x, float y, float velocityX, float velocityY){
 		int scaleFactor = 2;
 		spriteSheet = new Texture(Gdx.files.internal(BOSS1_PROJECTILE));
 		position = new Vector2(x, y);
 		boundsBox = new Rectangle();
-		velocity = new Vector2(-550, velocityY);
+		velocity = new Vector2(velocityX, velocityY);
 		width = 36 * scaleFactor;
 		height = 44 * scaleFactor;
 		int FRAME_COLS = 7;

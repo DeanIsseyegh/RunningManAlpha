@@ -8,13 +8,9 @@ public abstract class AbstractProjectile extends AbstractWorldObject{
 	
 	public void reflect(){ 
 		if (!isReflected){
-			System.out.println("BEFORE velocity.x : " + velocity.x);
 			velocity.x = -velocity.x + 600;
 			velocity.y = -velocity.y;
 			isReflected = true;
-			System.out.println("REFLECTED velocity.x : " + velocity.x);
-		} else {
-			//doNothing
 		}
 	}
 
@@ -24,6 +20,13 @@ public abstract class AbstractProjectile extends AbstractWorldObject{
 
 	public void setReflected(boolean isReflected) {
 		this.isReflected = isReflected;
+	}
+	
+	public void destroy(){
+		position.x = -1;
+		position.y = -1;
+		velocity.x = 0;
+		velocity.y = 0;
 	}
 
 }

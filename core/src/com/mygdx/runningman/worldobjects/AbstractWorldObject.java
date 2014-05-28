@@ -17,6 +17,7 @@ public abstract class AbstractWorldObject implements IWorldObject {
 	
 	protected int width;
 	protected int height;
+	protected int numOfXEmptyPxls;
 	protected float time;
 	
 	/**
