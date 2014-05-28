@@ -19,10 +19,9 @@ public class Enemy1 extends AbstractWorldObject implements IEnemy {
 	private IWorldObject mainChar;
 	
 	public Enemy1(int posX, IWorldObject mainChar){
-		spriteSheet = new Texture(Gdx.files.internal(ENEMY1_IMAGE)); //actual 24px wide 37px high
+		super(ENEMY1_IMAGE);
 		velocity = new Vector2(-200, 0);
 		position = new Vector2(posX, 0);
-		boundsBox = new Rectangle();
 		width = 96;
 		height = 148;
 		int FRAME_COLS = 5;

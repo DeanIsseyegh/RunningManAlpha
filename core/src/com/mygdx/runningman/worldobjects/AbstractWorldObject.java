@@ -1,5 +1,6 @@
 package com.mygdx.runningman.worldobjects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,6 +20,48 @@ public abstract class AbstractWorldObject implements IWorldObject {
 	protected int height;
 	protected int numOfXEmptyPxls;
 	protected float time;
+	
+	/**
+	 * Default constructor that initialises the boundsBox variable - the only necessary member that requires no parameters
+	 * to be initialised.
+	 */
+	public AbstractWorldObject(){
+		boundsBox = new Rectangle();
+	}
+	
+	/**
+	 * Minimalist constructor that initialises the bare minimum for an object
+	 * 
+	 * @param spriteSheetPath
+	 */
+	public AbstractWorldObject(String spriteSheetPath){
+		boundsBox = new Rectangle();
+		spriteSheet = new Texture(Gdx.files.internal(spriteSheetPath));
+	}
+	
+	/**
+	 * 
+	 * Optional constructor that initialises most of the needed/expected variables for a game object.
+	 * 
+	 * @param spriteSheetPath
+	 * @param velocityX
+	 * @param velocityY
+	 * @param positionX
+	 * @param positionY
+	 * @param width
+	 * @param height
+	 */
+	public AbstractWorldObject(String spriteSheetPath, float velocityX, float velocityY, float positionX, float positionY, int width, int height){
+		boundsBox = new Rectangle();
+		
+		spriteSheet = new Texture(Gdx.files.internal(spriteSheetPath));
+		
+		velocity = new Vector2(velocityX, velocityY);
+		position = new Vector2(positionX, positionY);
+		
+		this.width = width;
+		this.height = height;
+	}
 	
 	/**
 	 * Will take in a spriteSheet image and return it as an Animation object.

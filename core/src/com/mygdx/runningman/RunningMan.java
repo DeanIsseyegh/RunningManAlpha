@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.Boss1;
 import com.mygdx.runningman.worldobjects.characters.Enemy1;
@@ -34,8 +35,6 @@ public class RunningMan implements ApplicationListener
 	private ArrayList<Integer> backgroundPositions; 
 	
 	private SpriteBatch batch;
-	
-	private CollisionManager collisionManager;
 	
 	private OrthographicCamera camera;
 	
@@ -56,12 +55,11 @@ public class RunningMan implements ApplicationListener
 	private boolean rightScreenTouched = false;
 	
 	private boolean isGameOver = false;
-	private boolean isBossFight = false;
-	private boolean isBoss1FightOver = false;
-	private float timeSinceBossStart;
 	
+	private CollisionManager collisionManager;
 	private GameHUDManager gameHUDManager;
 	private SoundManager soundManager;
+	private BossFightManager bossFightManager;
 
 	/**
 	 * create()
@@ -77,8 +75,8 @@ public class RunningMan implements ApplicationListener
 		time = 0;
 		mainChar = new MainCharacter(scrollSpeed, this);
 		
-		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, 15, 600, 700);
-		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, 15, 600, 700);
+		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, 1, 600, 700);
+		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, 1, 600, 700);
 		initBackground();
 		
 		batch = new SpriteBatch();
@@ -86,10 +84,12 @@ public class RunningMan implements ApplicationListener
 		actualScreenHeight = 800;
 		configureCamera();
 		
+		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this))); //setup custom controls
 		collisionManager = new CollisionManager();
-		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this)));
 		gameHUDManager = new GameHUDManager();
 		soundManager = new SoundManager();
+		bossFightManager = new BossFightManager(this, posOfLastEnemy1, posOfLastEnemy1, mainChar);
+		
 		soundManager.playLevel1Music();
 	}
 	
@@ -171,13 +171,13 @@ public class RunningMan implements ApplicationListener
 		for (IWorldObject e : enemy2Array)
 		 	e.update(deltaTime, batch);
 	
-		 bossFightHandle(deltaTime);
+		bossFightManager.handle(deltaTime, batch);
 		 	
 		batch.end();		
 	
 		camera.translate(scrollSpeed * deltaTime, 0);
 			
-		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, boss1, this);
+		collisionManager.checkCollisions(mainChar, enemy1Array, enemy2Array, this);
 			
 		gameOverConditions();
 			
@@ -187,45 +187,6 @@ public class RunningMan implements ApplicationListener
 		gameHUDManager.getPointsLabel().setText("Points: " + points);
 		gameHUDManager.getStage().draw();
 	    
-	}
-	private Vector3 camPos;
-	
-	/**
-	 * bossFightHandle()
-	 * 
-	 * A helper method used to handle boss fights making sure they start and end under the right conditions. 
-	 * 
-	 */
-	private void bossFightHandle(float deltaTime){
-		
-		if (!isBoss1FightOver){ //if the boss1 fight is not over/already happened.
-			
-			if (mainChar.getX() > posOfLastEnemy1 && mainChar.getX() > posOfLastEnemy2 && !isBossFight){
-				soundManager.stopLevel1Music();
-			}
-			
-			if (mainChar.getX() + -1200 > posOfLastEnemy1 && mainChar.getX() - 1600> posOfLastEnemy2 && !isBossFight){
-				gameHUDManager.showBossLabel();
-				isBossFight = true;
-				timeSinceBossStart = 0;
-				boss1 = new Boss1(mainChar.getX() + 1000, this);
-		 	}	
-			
-			if (isBossFight){
-				timeSinceBossStart += deltaTime;
-				if (timeSinceBossStart > 4f)
-					gameHUDManager.removeBossLabel();
-				
-				boss1.update(deltaTime, batch);
-				if (boss1.getX() > mainChar.getX() + Gdx.graphics.getWidth() + (Gdx.graphics.getWidth() * 0.15f)){
-					boss1 = null;
-					isBossFight = false;
-					isBoss1FightOver = true;
-					soundManager.destroyBoss1Resources();
-				}
-			}
-	
-		}
 	}
 	
 	/**
@@ -350,5 +311,8 @@ public class RunningMan implements ApplicationListener
 	public SoundManager getSoundManager() {
 		return soundManager;
 	}
-	
+
+	public BossFightManager getBossFightManager() {
+		return bossFightManager;
+	}
 }

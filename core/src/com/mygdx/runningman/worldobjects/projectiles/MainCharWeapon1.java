@@ -12,9 +12,8 @@ import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 public class MainCharWeapon1 extends AbstractWorldObject{
 	
 	public MainCharWeapon1(float x, float y){
-		spriteSheet = new Texture(Gdx.files.internal(MAIN_CHAR_WEAPON1));
+		super(MAIN_CHAR_WEAPON1);
 		position = new Vector2(x, y);
-		boundsBox = new Rectangle();
 		velocity = new Vector2(600, 0);
 		width = 114;
 		height = 32;

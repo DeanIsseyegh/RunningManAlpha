@@ -59,17 +59,20 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 	private int currentBossHealth;
 	
 	public Boss1(float posX, RunningMan runningMan){
+		super(BOSS1_IMAGE);
 		runningMan.getSoundManager().initBoss1Resources();
 		this.runningMan = runningMan;
+		
 		currentBossHealth = 10;
-		spriteSheet = new Texture(Gdx.files.internal(BOSS1_IMAGE)); //actual 127px wide 88px high
+		
 		velocity = new Vector2(250, -400);
 		position = new Vector2(posX, 1000);
-		boundsBox = new Rectangle();
+		
 		int scaleFactor = 4;
 		width = 127 * scaleFactor;
 		height = 86 * scaleFactor;
 		numOfXEmptyPxls = 8 * scaleFactor;
+		
 		int FRAME_COLS = 16;
 		int FRAME_ROWS = 1;
 		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, spriteSheet);

@@ -13,9 +13,8 @@ import com.mygdx.runningman.worldobjects.IWorldObject;
 public class Enemy2 extends AbstractWorldObject implements IEnemy {
 
 	public Enemy2(int posX){
-		spriteSheet = new Texture(Gdx.files.internal(ENEMY2_IMAGE)); //Actual each sprite 33px wide, 3 empty on left side
+		super(ENEMY2_IMAGE);
 		position = new Vector2(posX, 0);
-		boundsBox = new Rectangle();
 		width = 99; //3x stretch
 		height = 90; //3x stretch
 		int FRAME_COLS = 3;

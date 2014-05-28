@@ -12,7 +12,7 @@ public class BloodSplatProjectile extends AbstractProjectile {
 	private boolean isMultipleSplats;
 	
 	public BloodSplatProjectile(float posX, float posY){
-		spriteSheet = new Texture(Gdx.files.internal(BLOOD_SPLAT));
+		super(BLOOD_SPLAT);
 		TextureRegion[] aniFrames = animateFromSpriteSheet(1, 1, spriteSheet);
 		animation = new Animation(0.1f, aniFrames);
 		int scaleFactor = 2;

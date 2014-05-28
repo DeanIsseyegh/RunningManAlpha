@@ -26,13 +26,12 @@ public class MainCharacter extends AbstractWorldObject {
 	private RunningMan runningMan;
 
 	public MainCharacter(int scrollSpeed, RunningMan runningMan){
+		super(MAIN_CHAR_IMAGE); //608 x 240 pixels - 8 COLS, 2 ROWS
 		width = 125;
 		height = 200;
-		spriteSheet = new Texture(Gdx.files.internal(MAIN_CHAR_IMAGE)); //608 x 240 pixels - 8 COLS, 2 ROWS
 		position = new Vector2(0, 0);
 		velocity = new Vector2(scrollSpeed, 0);
 		isInAir = false;
-		boundsBox = new Rectangle();
 		width = 120;
 		height = 200;
 		int FRAME_COLS = 8;

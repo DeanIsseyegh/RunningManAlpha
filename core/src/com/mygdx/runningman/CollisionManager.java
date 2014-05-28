@@ -2,11 +2,9 @@ package com.mygdx.runningman;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.IEnemy;
 import com.mygdx.runningman.worldobjects.projectiles.AbstractProjectile;
-import com.mygdx.runningman.worldobjects.projectiles.BloodSplatProjectile;
 
 public class CollisionManager {
 	
@@ -14,7 +12,7 @@ public class CollisionManager {
 	private AbstractProjectile boss1Projectile1;
 	private AbstractProjectile boss1Projectile2;
 
-	public void checkCollisions(IWorldObject mainChar, ArrayList<IEnemy> enemy1Array, ArrayList<IEnemy> enemy2Array, IEnemy boss1, RunningMan runningMan){
+	public void checkCollisions(IWorldObject mainChar, ArrayList<IEnemy> enemy1Array, ArrayList<IEnemy> enemy2Array, RunningMan runningMan){
 		
 		for (IEnemy e : enemy1Array){
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox()))
@@ -29,7 +27,7 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox()))
 				runningMan.setGameOver(true);
 		
-		handleBossCollisions(mainChar, boss1, runningMan);
+		handleBossCollisions(mainChar, runningMan.getBossFightManager().getBoss1(), runningMan);
 	}
 	
 	private void handleBossCollisions(IWorldObject mainChar, IEnemy boss1, RunningMan runningMan){
