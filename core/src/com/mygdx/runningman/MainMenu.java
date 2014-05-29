@@ -121,8 +121,8 @@ public class MainMenu implements Screen {
 	}
 	
 	private void startGame(){
-		game.setScreen(game.getLevel2());
-		//game.setScreen(game.getLevel1());
+		//game.setScreen(game.getLevel2());
+		game.setScreen(game.getLevel1());
 	}
 	
 	private void exitGame(){
@@ -167,16 +167,10 @@ public class MainMenu implements Screen {
 	}
 	
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void dispose() {}
 
 	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void pause() {}
 
 
 	@Override
@@ -185,10 +179,7 @@ public class MainMenu implements Screen {
 	}
 
 	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void resume() {}
 
 	@Override
 	public void hide() {

@@ -323,7 +323,10 @@ public abstract class AbstractRunningManListener implements Screen
 	}
 	
 	private void resetGame(){
-		soundManager.stopLevel1Music();
+		if (this instanceof RunningManLevel1)
+			soundManager.stopLevel1Music();
+		if (this instanceof RunningManLevel2)
+			soundManager.destroyLevel2Resources();
 		configureCamera();
 		game.setScreen(game.getMainMenu());
 	}
@@ -338,6 +341,7 @@ public abstract class AbstractRunningManListener implements Screen
 	private void gameOverConditions(){
 		if (isGameOver){
 			soundManager.playDieSound();
+			soundManager.destroyLevel2Resources();
 			soundManager.destroyBoss1Resources();
 			resetGame();
 		}

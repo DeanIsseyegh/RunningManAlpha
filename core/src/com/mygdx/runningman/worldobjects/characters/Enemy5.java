@@ -18,8 +18,10 @@ import com.mygdx.runningman.RunningManLevel2;
 import com.mygdx.runningman.RunningManLevel2.Level2State;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
+import com.mygdx.runningman.worldobjects.projectiles.AbstractProjectile;
 import com.mygdx.runningman.worldobjects.projectiles.Enemy5Projectile;
 import com.mygdx.runningman.worldobjects.projectiles.Enemy5Projectile.E5ProjectileState;
+import com.mygdx.runningman.worldobjects.projectiles.MetalSplat;
 
 public class Enemy5 extends AbstractWorldObject implements IEnemy {
 	
@@ -29,6 +31,7 @@ public class Enemy5 extends AbstractWorldObject implements IEnemy {
 	private Enemy5Projectile projectile;
 	private AbstractRunningManListener runningMan;
 	private int healthP;
+	private AbstractProjectile metalSplat;
 	
 	public Enemy5(IWorldObject mainChar, AbstractRunningManListener runningMan){
 		super(ENEMY5_IMAGE);
@@ -110,6 +113,8 @@ public class Enemy5 extends AbstractWorldObject implements IEnemy {
 		
 		if (projectile != null)
 			projectile.update(deltaTime, batch);
+		if (metalSplat != null)
+			metalSplat.update(deltaTime, batch);
 	}
 
 	@Override
@@ -132,6 +137,7 @@ public class Enemy5 extends AbstractWorldObject implements IEnemy {
 			kill();
 		else
 			healthP = healthP - 1;
+		metalSplat = new MetalSplat(position.x + width/4, position.y + height/4);
 	}
 
 }

@@ -30,11 +30,10 @@ public class RunningManLevel2 extends AbstractRunningManListener  {
 		this.backgroundWidth = IWorldObject.BG2_WIDTH;
 		initBackground(IWorldObject.BG2_IMAGE, IWorldObject.BG2_FLOOR, backgroundWidth);
 		
-		numOfEnemy3 = 1;
-		numOfEnemy4 =1;
+		numOfEnemy3 = 4;
+		numOfEnemy4 = 4;
 		enemy3Array = initRandomEnemies(IWorldObject.ENEMY3, numOfEnemy3, 3000, 0, 600);
 		enemy4Array = initRandomEnemies(IWorldObject.ENEMY4, numOfEnemy4, 3000, 0, 1600);
-		
 		
 		bird1Array = initRandomCharacters(IWorldObject.BIRD1, 15, 1600, 2000, 1100);
 		arrayOfCharacters.addAll(enemy3Array);
@@ -44,7 +43,8 @@ public class RunningManLevel2 extends AbstractRunningManListener  {
 		arrayOfCharacters.add(enemy5);
 	
 		collisionManager.setToLevel2State(enemy3Array, enemy4Array, enemy5);
-		soundManager.playLevel1Music();
+		soundManager.playLevel2Music();
+		soundManager.initLevel2Resources();
 		
 		state = Level2State.Part1;
 	}

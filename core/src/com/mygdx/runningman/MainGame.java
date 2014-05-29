@@ -19,8 +19,8 @@ public class MainGame extends Game {
 		level1 = new RunningManLevel1(this, soundManager);
 		level2 = new RunningManLevel2(this, soundManager);
 		
-		//setScreen(mainMenu);
-		setScreen(level2);
+		setScreen(mainMenu);
+		//setScreen(level2);
 	}
 
 	

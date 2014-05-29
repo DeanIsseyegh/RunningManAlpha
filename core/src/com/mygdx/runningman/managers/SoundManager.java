@@ -8,6 +8,7 @@ public class SoundManager {
 	
 	private static final String MAINMENU_MUSIC = "music/MainMenuMusic.wav";
 	private static final String LEVEL1_MUSIC = "music/Level1Music.mp3";
+	private static final String LEVEL2_MUSIC = "music/Level2Music.mp3";
 	private static final String BOSS1_MUSIC = "music/Boss1Music.mp3";
 	
 	private static final String JUMP_SOUND = "music/JumpSound.wav";
@@ -20,8 +21,11 @@ public class SoundManager {
 	private static final String BOSS1_RAGE = "music/Boss1Rage.wav";
 	private static final String BOSS1_DEATH = "music/Boss1Death.ogg";
 	
+	private static final String ENEMY5_HURT = "music/Enemy5Hurt.wav";
+	
 	private Music mainMenuMusic;
 	private Music level1Music;
+	private Music leve2Music;
 	private Music boss1Music;
 	
 	private Sound jumpSound;
@@ -33,6 +37,8 @@ public class SoundManager {
 	private Sound boss1Hurt;
 	private Sound boss1Rage;
 	private Sound boss1Death;
+	
+	private Sound enemy5Hurt;
 	
 	public SoundManager(){
 		jumpSound = Gdx.audio.newSound(Gdx.files.internal(JUMP_SOUND));
@@ -68,6 +74,36 @@ public class SoundManager {
 			level1Music.dispose();
 			level1Music = null;
 		}
+	}
+	
+	public void playLevel2Music(){
+		if (leve2Music == null)
+			leve2Music = Gdx.audio.newMusic(Gdx.files.internal(LEVEL2_MUSIC));
+		leve2Music.setVolume(0.25f);
+		leve2Music.play();
+	}
+	
+	public void stopLevel2Music(){
+		if (leve2Music != null){
+			leve2Music.stop();
+			leve2Music.dispose();
+			leve2Music = null;
+		}
+	}
+	
+	public void initLevel2Resources(){
+		enemy5Hurt = Gdx.audio.newSound(Gdx.files.internal(ENEMY5_HURT));
+	}
+	
+	public void destroyLevel2Resources(){
+		if (enemy5Hurt != null)
+			enemy5Hurt.dispose();
+		if (leve2Music != null)
+			leve2Music.dispose();
+	}
+	
+	public void playEnemy5HurtSound(){
+		enemy5Hurt.play();
 	}
 	
 	public void playJumpSound(){

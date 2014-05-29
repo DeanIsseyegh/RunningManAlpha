@@ -117,6 +117,7 @@ public class CollisionManager {
 				&& enemy5Projectile.isReflected()
 				&& enemy5Projectile.getBoundingBox().overlaps(enemy5.getBoundingBox()) ){
 			enemy5.loseHealth();
+			runningMan.getSoundManager().playEnemy5HurtSound();
 			enemy5Projectile = null;
 		}
 	}

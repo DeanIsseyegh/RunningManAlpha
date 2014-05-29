@@ -96,7 +96,7 @@ public class Enemy3 extends AbstractWorldObject implements IEnemy {
 	public void kill() {
 		state = EnemyState.DEAD;
 		boundsBox.set(0, 0, 0 ,0);
-		spriteSheet = new Texture(Gdx.files.internal(BLOOD_SPLAT));
+		spriteSheet = new Texture(Gdx.files.internal(METAL_SPLAT));
 		TextureRegion[] aniFrames = animateFromSpriteSheet(1, 1, spriteSheet);
 		animation = new Animation(0.1f, aniFrames);
 		width = 50 * 2;

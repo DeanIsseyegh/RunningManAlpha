@@ -34,10 +34,11 @@ public interface IWorldObject {
 	static final String BOSS1_PROJECTILE = "boss1/Boss1Projectile1.png";
 	static final String BOSS1_DYING 	 = "boss1/Boss1Dying.png";
 	
-	static final String BLOOD_SPLAT 	  = "bloodsplat.png";
-	static final String BIRD1_IMAGE 	  = "Bird1.png";
-	static final String ENEMY3_PROJECTILE = "enemies/Enemy3_Projectile.png";
-	static final String ENEMY5_PROJECTILE_RED = "enemies/Enemy5ProjectileRed.png";
+	static final String BLOOD_SPLAT 	  		 = "bloodsplat.png";
+	static final String METAL_SPLAT 	  		 = "MetalSplat2.png";
+	static final String BIRD1_IMAGE 	 		 = "Bird1.png";
+	static final String ENEMY3_PROJECTILE		 =	 "enemies/Enemy3_Projectile.png";
+	static final String ENEMY5_PROJECTILE_RED	 = "enemies/Enemy5ProjectileRed.png";
 	static final String ENEMY5_PROJECTILE_ORANGE = "enemies/Enemy5ProjectileOrange.png";
 	
 	public void update(float deltaTime, SpriteBatch batch);
