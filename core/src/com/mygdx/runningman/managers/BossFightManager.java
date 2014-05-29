@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.runningman.AbstractRunningManListener;
 import com.mygdx.runningman.RunningManLevel1;
+import com.mygdx.runningman.RunningManLevel2;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.Boss1;
@@ -56,11 +57,23 @@ public class BossFightManager {
 		BossFight1,
 		BossFight2;
 	}
+	
 	/**
 	 * Handles the no boss state - will trigger boss fights (basically set state to a bossfight) if certain
 	 * conditions are met.
 	 */
 	private void noBossFightLogic(){
+	
+		if (runningMan instanceof RunningManLevel1) 
+			noBossFightLogicLevel1();
+		else if (runningMan instanceof RunningManLevel2)
+			noBossFightLogicLevel2();
+	}
+	
+	/**
+	 * Handles the boss fight logic for level1
+	 */
+	private void noBossFightLogicLevel1(){
 		if (mainChar.getX() > posOfLastEnemy
 				&& bossState == BossManagerState.NoBossFight
 				&& !isBoss1Dead){
@@ -74,7 +87,14 @@ public class BossFightManager {
 			
 			boss1 = new Boss1(mainChar.getX() + 1000, runningMan);
 			bossState = BossManagerState.BossFight1;
-	 	}	
+	 	}
+	}
+	
+	/**
+	 * Handles the boss fight logic for level2
+	 */
+	private void noBossFightLogicLevel2(){
+		//EMPTY FOR NOW
 	}
 	
 	/**
@@ -99,6 +119,7 @@ public class BossFightManager {
 			isBoss1Dead = true;
 			
 			bossState = BossManagerState.NoBossFight;
+			runningMan.getGame().setScreen(runningMan.getGame().getLevel2());;
 		}
 	}
 	

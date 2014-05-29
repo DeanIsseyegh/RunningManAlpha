@@ -51,6 +51,7 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 	private final int HP_02 = 2;
 	private final int HP_01 = 1;
 	private final int HP_00 = 0;
+	private final int POST_DEATH = -1;
 	
 	private final float towardsFeetProjectileY = -50;
 	private final float towardsHeadProjectileY = 50;
@@ -59,6 +60,12 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 	
 	private int currentBossHealth;
 	
+	/**
+	 * Similar to all other character constructors, but creates 2 additional animations (shooting and dying).
+	 * 
+	 * @param posX
+	 * @param runningMan
+	 */
 	public Boss1(float posX, AbstractRunningManListener runningMan){
 		super(BOSS1_IMAGE);
 		runningMan.getSoundManager().initBoss1Resources();
@@ -95,6 +102,10 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		dyingHeight = 100 * scaleFactor;
 	}
 	
+	/**
+	 * Uses a sort of state machine pattern - with the states being the bosses HP - to
+	 * dictate his movements and attack patterns - as seen in the switch statements.
+	 */
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		
@@ -104,7 +115,15 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		position.x += velocity.x * deltaTime;
 		boundsBox.set(position.x + width/2, position.y, width, height);
 		
-		if (!isDead){ 
+		switch(currentBossHealth){
+		
+		case POST_DEATH:
+			if (bloodSplat instanceof BloodSplatProjectile) 
+				((BloodSplatProjectile) bloodSplat).initMultipleSplats();
+			batch.draw(dyingAnimation.getKeyFrame(time, false), position.x , position.y, dyingWidth, dyingHeight);
+			break;
+			
+		default:
 			if (timeSinceLastShoot > 2.35f || isShootingAnimation){
 				isShootingAnimation = true;
 				shootingAnimationTime += deltaTime;
@@ -116,9 +135,7 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 				}
 			} else		
 				batch.draw(walkingAnimation.getKeyFrame(time, true), position.x , position.y, width, height);
-		} else {
-			if (bloodSplat instanceof BloodSplatProjectile) ((BloodSplatProjectile) bloodSplat).initMultipleSplats();
-			batch.draw(dyingAnimation.getKeyFrame(time, false), position.x , position.y, dyingWidth, dyingHeight);
+			break;
 		}
 		
 		//Handle boss states
@@ -204,8 +221,6 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 	 * projectile1 will be slow towards his feet - must be jumped to avoid damage
 	 * projectile2 will be slow towards his head - must be jumped AND attacked/reflected to avoid damage
 	 * 
-	 * 
-	 * 
 	 */
 	private void secondBossState(float deltaTime, SpriteBatch batch){
 		
@@ -223,6 +238,16 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		}
 	}
 	
+	/**
+	 * thirdBossState()
+	 * 
+	 * This the third boss state. Should go into his "shooting" animation every 2.35 seconds, and then produce a projectile1
+	 * at 3 seconds AND a projectile2.
+	 * 
+	 * projectile1 will be fast towards his feet - must be jumped to avoid damage
+	 * projectile2 will be fast towards his head - must be jumped AND attacked/reflected to avoid damage
+	 * 
+	 */
 	private void thirdBossState(float deltaTime, SpriteBatch batch){
 
 		if (timeSinceLastShoot > 3){
@@ -239,15 +264,24 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		}
 	}
 	
+	/**
+	 * Will make boss slowly move off screen by changing his speed, and reduce his health
+	 * by 1 (putting him in POST_DEATH state), and play his death sound.
+	 */
 	@Override
 	public void kill() {
-		isDead = true;
 		bloodSplat = new BloodSplatProjectile(position.x + width/2 - 50, position.y);
 		runningMan.getSoundManager().playBoss1DeathSound();
 		velocity.x += 100;
 		currentBossHealth = -1;
 	}
 
+	/**
+	 * Reduces bosses health by putting him into another HP_XX state.
+	 * Plays boss-rage-sound at 6 HP and 3 HP.
+	 * 
+	 * Also produces a blood-splat effect.
+	 */
 	@Override
 	public void loseHealth() {
 		currentBossHealth = currentBossHealth - 1;

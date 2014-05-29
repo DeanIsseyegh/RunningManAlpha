@@ -121,7 +121,8 @@ public class MainMenu implements Screen {
 	}
 	
 	private void startGame(){
-		game.setScreen(game.level1);
+		game.setScreen(game.getLevel2());
+		//game.setScreen(game.getLevel1());
 	}
 	
 	private void exitGame(){

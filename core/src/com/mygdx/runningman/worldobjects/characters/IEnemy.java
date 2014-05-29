@@ -6,4 +6,5 @@ public interface IEnemy extends IWorldObject{
 	
 	public void kill();
 	public void loseHealth();
+
 }

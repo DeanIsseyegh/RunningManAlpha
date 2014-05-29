@@ -34,12 +34,15 @@ public abstract class AbstractRunningManListener implements Screen
 	public static final String TAG = "MyLog";
 	
 	private Texture background;
+	
+	private Texture backgroundFloor;
 	protected int backgroundWidth;
 	private ArrayList<Integer> backgroundPositions; 
 	
 	private SpriteBatch batch;
 	
 	private OrthographicCamera camera;
+	private OrthographicCamera fixedCamera;
 	
 	protected IWorldObject mainChar;
 	protected float posOfLastEnemy;
@@ -63,7 +66,7 @@ public abstract class AbstractRunningManListener implements Screen
 	protected BossFightManager bossFightManager;
 
 	private MainGame game;
-	
+
 	public AbstractRunningManListener(MainGame game, SoundManager soundManager){
 		this.game = game;
 		this.soundManager = soundManager;
@@ -89,6 +92,7 @@ public abstract class AbstractRunningManListener implements Screen
 		
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
+		fixedCamera = new OrthographicCamera();
 		configureCamera();
 		
 		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this))); //setup custom controls
@@ -104,6 +108,12 @@ public abstract class AbstractRunningManListener implements Screen
 	 * Creates an array of enemies and will generate them at a random position
 	 * based on a RandomUtils.nextInt call.
 	 * 
+	 * @param typeOfEnemy - Should be a static string taken from IWorldObject
+	 * @param numOfEnemy - Number of enemies generated
+	 * @param minDistBetweenEnemies - Minimumn distance between each enemy
+	 * @param possibleMaxDistBetweenEnemies - Max distance between each enemy
+	 * @param initialStartingMinDistance - Initial starting distance will be this value PLUS the minDistanceBetweenEnemies
+	 * @return
 	 */
 	protected ArrayList<IEnemy> initRandomEnemies(String typeOfEnemy, int numOfEnemy, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies, int initialStartingMinDistance){
 		ArrayList<IEnemy> arrayOfEnemies = new ArrayList<IEnemy>();
@@ -115,15 +125,18 @@ public abstract class AbstractRunningManListener implements Screen
 		boolean isEnemy4 = (typeOfEnemy.equals(IWorldObject.ENEMY4));
 		
 		for (int i = 0; i < numOfEnemy; i++){
-			randomInt = RandomUtils.nextInt(randomInt, randomInt + possibleMaxDistBetweenEnemies) + minDistBetweenEnemies; 
+			if (!(randomInt > randomInt + possibleMaxDistBetweenEnemies))
+				randomInt = RandomUtils.nextInt(randomInt, randomInt + possibleMaxDistBetweenEnemies) + minDistBetweenEnemies; 
+			else
+				randomInt += minDistBetweenEnemies;
 			if (isEnemy1)
 				arrayOfEnemies.add(new Enemy1(randomInt, mainChar));
 			else if (isEnemy2)
 				arrayOfEnemies.add(new Enemy2(randomInt));
 			else if (isEnemy3)
-				arrayOfEnemies.add(new Enemy3(randomInt));
+				arrayOfEnemies.add(new Enemy3(randomInt, mainChar, this));
 			else if (isEnemy4)
-				arrayOfEnemies.add(new Enemy4(randomInt));
+				arrayOfEnemies.add(new Enemy4(randomInt, mainChar, this));
 		}
 		
 		
@@ -132,6 +145,16 @@ public abstract class AbstractRunningManListener implements Screen
 		return arrayOfEnemies;
 	}
 	
+	/**
+	 * Extremely similar method to initRandomEnemies but is mainly for misc NPC and characters, such as birds.
+	 * 
+	 * @param typeOfChar
+	 * @param numOfChars
+	 * @param minDistBetweenEnemies
+	 * @param possibleMaxDistBetweenEnemies
+	 * @param initialStartingMinDistance
+	 * @return
+	 */
 	protected ArrayList<IWorldObject> initRandomCharacters(String typeOfChar, int numOfChars, int minDistBetweenEnemies, int possibleMaxDistBetweenEnemies, int initialStartingMinDistance){
 		int randomInt = initialStartingMinDistance;
 		ArrayList<IWorldObject> arrayOfChars = new ArrayList<IWorldObject>();
@@ -154,15 +177,23 @@ public abstract class AbstractRunningManListener implements Screen
 	 * hold the x coordinates for where a background will be rendered. Note they are all spaced equally with a different
 	 * of X. X = Widths of background in pixels
 	 * 
+	 * @param backgroundImagePath
+	 * @param backgroundFloorImagePath
+	 * @param backgroundWidth
 	 */
-	protected void initBackground(String backgroundImagePath, int backgroundWidth){
+	protected void initBackground(String backgroundImagePath, String backgroundFloorImagePath, int backgroundWidth){
 		background = new Texture(Gdx.files.internal(backgroundImagePath));
+		if (backgroundFloorImagePath != null) backgroundFloor = new Texture(Gdx.files.internal(backgroundFloorImagePath));
 		backgroundPositions = new ArrayList<Integer>(); 
 		
 		for (int i = 0; i < 4; i++)
 			backgroundPositions.add(backgroundWidth * i);
 	}
 	
+	protected void initBackgroundWithoutFloor(String backgroundImagePath, int backgroundWidth){
+		backgroundFloor = null;
+		initBackground(backgroundImagePath, null, backgroundWidth);
+	}
 	/**
 	 * render()
 	 * 
@@ -182,8 +213,13 @@ public abstract class AbstractRunningManListener implements Screen
 
 	    time += deltaTime;
 	    camera.update();
+	    
+	    batch.setProjectionMatrix(fixedCamera.combined);
+	    batch.begin();
+	    batch.draw(background,0,0);
+	    batch.end();
+	    
 		batch.setProjectionMatrix(camera.combined);
-		    
 		batch.begin(); 
 		 	
 		renderInfiniteBackground(batch);
@@ -237,8 +273,10 @@ public abstract class AbstractRunningManListener implements Screen
 			backgroundPositions.add( backgroundPositions.get(backgroundPositions.size() - 1) + backgroundWidth );
 		}
 		
-		for (int i = 0; i < backgroundPositions.size(); i++)
-			batch.draw(background, backgroundPositions.get(i), 0);
+		for (int i = 0; i < backgroundPositions.size(); i++){
+			if (backgroundFloor != null)
+				batch.draw(backgroundFloor, backgroundPositions.get(i), 0);
+		}
 	}
 	
 	@Override
@@ -276,22 +314,25 @@ public abstract class AbstractRunningManListener implements Screen
 		if (Gdx.graphics.getHeight() < Gdx.graphics.getWidth()) {
 			actualScreenWidth = actualScreenHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
 			camera.setToOrtho(false, actualScreenWidth, actualScreenHeight);
+			fixedCamera.setToOrtho(false, actualScreenWidth, actualScreenHeight);
 		} else {
 			actualScreenWidth = actualScreenHeight * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
 			camera.setToOrtho(false, actualScreenHeight, actualScreenWidth);
+			fixedCamera.setToOrtho(false, actualScreenWidth, actualScreenHeight);
 		}
 	}
 	
 	private void resetGame(){
 		soundManager.stopLevel1Music();
 		configureCamera();
-		game.setScreen(game.mainMenu);
+		game.setScreen(game.getMainMenu());
 	}
 	
 	/**
 	 * gameOverConditions()
 	 * 
-	 * Includes conditions for a game over. Usually when/if the main character collides with something
+	 * Includes conditions for a game over. Usually when/if the main character collides with something.
+	 * Colision manager usually sets the isGameOver boolean state.
 	 * 
 	 */
 	private void gameOverConditions(){
@@ -353,5 +394,9 @@ public abstract class AbstractRunningManListener implements Screen
 
 	public void setScrollSpeed(int scrollSpeed) {
 		this.scrollSpeed = scrollSpeed;
+	}
+	
+	public MainGame getGame() {
+		return game;
 	}
 }

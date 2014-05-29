@@ -7,15 +7,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 
 public class Enemy1 extends AbstractWorldObject implements IEnemy {
 	
-	boolean isKilled = false;
+	private EnemyState state;
 	private IWorldObject mainChar;
 	
 	public Enemy1(int posX, IWorldObject mainChar){
@@ -30,26 +28,36 @@ public class Enemy1 extends AbstractWorldObject implements IEnemy {
 		ArrayUtils.reverse(aniFrames);
 		animation = new Animation(0.1f, aniFrames);
 		this.mainChar = mainChar;
+		state = EnemyState.NORMAL;
 	}
 	
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		time += deltaTime;
-		if (isKilled){				
-			boundsBox.set(0,0,0,0);
-			position.y += velocity.y * deltaTime;
-		} else {
+
+		switch (state){
+		case NORMAL:
 			boundsBox.set(position.x , position.y, width, height);
 			position.x += velocity.x * deltaTime;
 			position.y = mainChar.getY();
+			break;
+			
+		case DEAD:
+			boundsBox.set(0,0,0,0);
+			position.y += velocity.y * deltaTime;
+			break;
+			
+		default:
+			break;
 		}
+		
 		batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
 		
 	}
 
 	@Override
 	public void kill() {
-		isKilled = true;
+		state = EnemyState.DEAD;
 		boundsBox.set(0, 0, 0 ,0);
 		spriteSheet = new Texture(Gdx.files.internal(BLOOD_SPLAT));
 		TextureRegion[] aniFrames = animateFromSpriteSheet(1, 1, spriteSheet);

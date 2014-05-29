@@ -1,17 +1,13 @@
 package com.mygdx.runningman.worldobjects.characters;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
-import com.mygdx.runningman.worldobjects.IWorldObject;
 
 public class Enemy2 extends AbstractWorldObject implements IEnemy {
-
+	
 	public Enemy2(int posX){
 		super(ENEMY2_IMAGE);
 		position = new Vector2(posX, 0);

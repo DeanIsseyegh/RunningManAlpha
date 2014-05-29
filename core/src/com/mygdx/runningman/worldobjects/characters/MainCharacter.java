@@ -79,7 +79,7 @@ public class MainCharacter extends AbstractWorldObject {
 		if (isInAir){
 			animationTime = 0.65f;
 			velocity.y -= 300 * deltaTime; //Make jumping more realistic/smoother emulate gravity
-			if (position.y > hardCodedJumpHeight) 
+			if (position.y > hardCodedJumpHeight) // Go back down towards ground after certain height hit
 				velocity.y = -velocity.y;
 		}
 		
