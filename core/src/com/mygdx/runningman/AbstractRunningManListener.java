@@ -6,15 +6,13 @@ import javax.microedition.khronos.opengles.GL10;
 
 import org.apache.commons.lang3.RandomUtils;
 
-import android.util.Log;
-
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.mygdx.runningman.managers.BossFightManager;
 import com.mygdx.runningman.managers.CollisionManager;
 import com.mygdx.runningman.managers.GameHUDManager;
@@ -49,6 +47,9 @@ public abstract class AbstractRunningManListener implements Screen
 	protected ArrayList<IWorldObject> arrayOfCharacters;
 	
 	private float time;
+	private float timeSinceDeath;
+	private float fadeTimeAlpha;
+	
 	private int actualScreenWidth;
 	private int actualScreenHeight = 800;
 	protected int scrollSpeed = 250;
@@ -59,6 +60,7 @@ public abstract class AbstractRunningManListener implements Screen
 	private boolean rightScreenTouched = false;
 	
 	private boolean isGameOver = false;
+	private boolean hasDeathSoundPlayed = false;
 	
 	protected CollisionManager collisionManager;
 	protected GameHUDManager gameHUDManager;
@@ -81,10 +83,13 @@ public abstract class AbstractRunningManListener implements Screen
 	@Override
 	public void show()
 	{
-		Log.v(TAG, "Game created. . .");
+		scrollSpeed = 250;
 		isGameOver = false;
-		points = 0;
+		hasDeathSoundPlayed = false;
+		points = game.getPoints();
 		time = 0;
+		fadeTimeAlpha = 1;
+		timeSinceDeath = 0;
 		
 		mainChar = new MainCharacter(scrollSpeed, this);
 		arrayOfCharacters = new ArrayList<IWorldObject>();
@@ -208,17 +213,19 @@ public abstract class AbstractRunningManListener implements Screen
 	@Override
 	public void render(float deltaTime)
 	{        
-	    Gdx.gl.glClearColor(0, 159, 205, 0);
+	    Gdx.gl.glClearColor(0, 0, 0, 0);
 	    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
 	    time += deltaTime;
 	    camera.update();
 	    
+	    //Render static background using fixed camera
 	    batch.setProjectionMatrix(fixedCamera.combined);
 	    batch.begin();
 	    batch.draw(background,0,0);
 	    batch.end();
 	    
+	    //Set moving camera and begin rendering characters, moving floor background and mainChar etc.
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin(); 
 		 	
@@ -234,13 +241,15 @@ public abstract class AbstractRunningManListener implements Screen
 		camera.translate(scrollSpeed * deltaTime, 0);
 		
 		collisionManager.handleCollisions();
-		gameOverConditions();
+		gameOverConditions(deltaTime);
 		resetCustomControlState();
-			
-		points += deltaTime * 80;
+		
+		if (!isGameOver)
+			points += deltaTime * 80;
 		gameHUDManager.getPointsLabel().setText("Points: " + points);
 		gameHUDManager.getStage().draw();
-	    
+		gameHUDManager.getStage().act();
+	  
 	}
 	
 	/**
@@ -284,22 +293,18 @@ public abstract class AbstractRunningManListener implements Screen
 
 	@Override
 	public void resize(int width, int height){
-		Log.v(TAG, "Gametime: " + time + " Game resized. . . ");
 	}
 
 	@Override
 	public void pause(){
-		Log.v(TAG, "Gametime: " + time + " Game paused. . .");
 	}
 
 	@Override
 	public void resume(){
-		Log.v(TAG, "Gametime: " + time + " Game resumed. . .");
 	}
 	
 	@Override
 	public void hide(){
-		Log.v(TAG, "Gametime: " + time + " Game hiding. . .");
 		batch.dispose();
 		background.dispose();
 	}
@@ -322,13 +327,28 @@ public abstract class AbstractRunningManListener implements Screen
 		}
 	}
 	
-	private void resetGame(){
-		if (this instanceof RunningManLevel1)
-			soundManager.stopLevel1Music();
-		if (this instanceof RunningManLevel2)
-			soundManager.destroyLevel2Resources();
+	/**
+	 * Handles the fading out of everything drawn by the batch (SpriteBatch) gracefully.
+	 * 
+	 * @param timeSinceDeath
+	 */
+	private void fadeOutScreen(float timeSinceDeath){
+		fadeTimeAlpha -= timeSinceDeath *0.05f;
+		if (fadeTimeAlpha < 0.2f)
+			fadeTimeAlpha = 0.001f;
+		batch.setColor(1.0f, 1.0f, 1.0f, fadeTimeAlpha);
+	}
+	
+	/**
+	 * Goes to the game over screen and sets the current points to the main game class - also destroys level specific sound resources
+	 * as they can be expensive to hold onto.
+	 */
+	private void goToGameOverScreen(){
+		hasDeathSoundPlayed = false; //prepare boolean state for next instance. Should be set in show() method to for assurance
+		soundManager.destroyLevelResources();
 		configureCamera();
-		game.setScreen(game.getMainMenu());
+		game.setPoints(points);
+		game.setScreen(game.getGameOverScreen());
 	}
 	
 	/**
@@ -338,12 +358,21 @@ public abstract class AbstractRunningManListener implements Screen
 	 * Colision manager usually sets the isGameOver boolean state.
 	 * 
 	 */
-	private void gameOverConditions(){
+	private void gameOverConditions( float deltaTime){
 		if (isGameOver){
-			soundManager.playDieSound();
-			soundManager.destroyLevel2Resources();
-			soundManager.destroyBoss1Resources();
-			resetGame();
+			scrollSpeed = 0;
+			mainChar.die();
+			timeSinceDeath += deltaTime;
+			fadeOutScreen(timeSinceDeath);
+			
+			if (!hasDeathSoundPlayed){
+				gameHUDManager.getStage().addAction(Actions.sequence(Actions.alpha(1), Actions.fadeOut(1)));
+				soundManager.playDieSound();
+				hasDeathSoundPlayed = true;
+			}
+			
+			if (timeSinceDeath > 2f)
+				goToGameOverScreen();
 		}
 	}
 	

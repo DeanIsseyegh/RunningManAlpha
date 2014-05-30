@@ -82,6 +82,21 @@ public abstract class AbstractWorldObject implements IWorldObject {
 		
 		return aniFrames;
 	}
+	
+	public void stopMoving(){
+		velocity.x = 0;
+		velocity.y = 0;
+	}
+	
+	public void stopMovingAndAnimation(){
+		stopMoving();
+		time = 0;
+	}
+	
+	public void die(){
+		stopMovingAndAnimation();
+		velocity.x = -250;
+	}
 
 	@Override
 	public float getX() {

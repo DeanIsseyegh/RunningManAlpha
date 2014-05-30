@@ -5,8 +5,8 @@ import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.mygdx.runningman.MainGame;
-import com.mygdx.runningman.MainMenu;
 import com.mygdx.runningman.RunningManLevel1;
+import com.mygdx.runningman.screens.MainMenu;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override

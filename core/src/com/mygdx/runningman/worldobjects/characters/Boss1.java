@@ -7,10 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.runningman.AbstractRunningManListener;
-import com.mygdx.runningman.RunningManLevel1;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.projectiles.AbstractProjectile;
 import com.mygdx.runningman.worldobjects.projectiles.BloodSplatProjectile;
@@ -167,9 +165,11 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		//Handle boss landing from sky and make sure he doesn't go below ground
 		if (position.y <= 0){
 			if (!hasBossLanded){
+				Gdx.input.vibrate(1000);
 				runningMan.getSoundManager().playBoss1LandedSound();
 				runningMan.getSoundManager().playBoss1Music();
 			}
+			
 			hasBossLanded = true;
 			position.y = 0;
 			velocity.y = 0;

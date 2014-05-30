@@ -2,6 +2,7 @@ package com.mygdx.runningman.managers;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
 import com.mygdx.runningman.AbstractRunningManListener;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.IEnemy;
@@ -133,15 +134,16 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
 			} else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
+				Gdx.input.vibrate(2);
 				e.kill();
 				runningMan.setPoints(runningMan.getPoints() + 200);
 			}
 		}
 		
 		for (IEnemy e : enemy2Array)
-			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox()))
+			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
-		
+			}
 		handleBoss1ProjectileCollisions(boss1Projectile1, runningMan.getBossFightManager().getBoss1());
 		handleBoss1ProjectileCollisions(boss1Projectile2, runningMan.getBossFightManager().getBoss1());
 	}

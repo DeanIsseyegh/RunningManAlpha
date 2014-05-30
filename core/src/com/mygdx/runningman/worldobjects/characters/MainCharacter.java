@@ -1,20 +1,11 @@
 package com.mygdx.runningman.worldobjects.characters;
 
-import android.util.Log;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.runningman.AbstractRunningManListener;
-import com.mygdx.runningman.RunningManLevel1;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
-import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.projectiles.MainCharWeapon1;
 
 public class MainCharacter extends AbstractWorldObject {
@@ -46,13 +37,16 @@ public class MainCharacter extends AbstractWorldObject {
 		lastSwordAttack = 2;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mygdx.runningman.worldobjects.IWorldObject#update(float, com.badlogic.gdx.graphics.g2d.SpriteBatch)
+	 */
 	@Override
 	public void update(float deltaTime, SpriteBatch batch) {
 		time += deltaTime;
 		animationTime = time;
 		lastSwordAttack += deltaTime;
 		
-		//If user touches screen and mainChar is touching the ground
+		//If user touches the left side of screen and mainChar is touching the ground
 		if (runningMan.isLeftScreenTouched() && position.y <= 0  && time > 1){
 			isInAir = true;
 			velocity.y = 300;
@@ -60,6 +54,7 @@ public class MainCharacter extends AbstractWorldObject {
 			runningMan.getSoundManager().playJumpSound();
 		} 
 		
+		//If user touches the right side of screen and he hasn't attacked too recently
 		if (runningMan.isRightScreenTouched() && lastSwordAttack > timeAllowedBetweenAttacks){
 			isAttacking = true;
 			lastSwordAttack = 0;

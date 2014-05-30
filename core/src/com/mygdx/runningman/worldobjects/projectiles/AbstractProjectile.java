@@ -1,8 +1,5 @@
 package com.mygdx.runningman.worldobjects.projectiles;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 
 public abstract class AbstractProjectile extends AbstractWorldObject implements IProjectile{

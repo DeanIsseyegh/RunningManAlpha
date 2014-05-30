@@ -50,4 +50,9 @@ public interface IWorldObject {
 	public float getHeight();
 	
 	public Rectangle getBoundingBox();
+	
+	public void stopMoving();
+	public void stopMovingAndAnimation();
+	public void die();
+	
 }

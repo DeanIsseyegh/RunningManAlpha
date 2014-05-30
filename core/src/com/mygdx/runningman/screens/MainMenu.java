@@ -1,4 +1,4 @@
-package com.mygdx.runningman;
+package com.mygdx.runningman.screens;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -17,9 +17,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.mygdx.runningman.MainGame;
 import com.mygdx.runningman.managers.SoundManager;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
@@ -34,8 +36,9 @@ public class MainMenu implements Screen {
 	public static final String BUTTON_PACK_IMAGE = "menu/RunningManPack.pack";
 	
 	private int actualScreenWidth;
-	private int actualScreenHeight = 800;
+	private int actualScreenHeight;
 	private float time;
+	private float fadeTime;
 	
 	private Texture logo;
 	private OrthographicCamera camera;
@@ -105,7 +108,12 @@ public class MainMenu implements Screen {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y,
 					int pointer, int button) {
-				startGame();
+				stage.addAction(Actions.sequence(Actions.fadeOut(1), Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						startGame();
+					}
+				})));
 				return true;
 			}
 		});
@@ -114,20 +122,27 @@ public class MainMenu implements Screen {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y,
 					int pointer, int button) {
-				exitGame();
+				stage.addAction(Actions.sequence(Actions.fadeOut(1), Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						exitGame();
+					}
+				})));
 				return true;
 			}
 		});
+		
+		stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(2)));
 	}
 	
 	private void startGame(){
-		//game.setScreen(game.getLevel2());
+		game.setPoints(0);
 		game.setScreen(game.getLevel1());
 	}
 	
 	private void exitGame(){
 		dispose();
-		System.exit(1);
+		Gdx.app.exit();
 	}
 	
 	private void initLogoCharacter(){
@@ -158,7 +173,11 @@ public class MainMenu implements Screen {
 	    float deltaTime = Gdx.graphics.getDeltaTime();
 	    time += deltaTime;
 	    
+	    if (fadeTime < 0.9f)
+	    	fadeTime += time * 0.01;
+	    
 	    batch.begin();
+	    batch.setColor(1.0f, 1.0f, 1.0f, fadeTime);
 	    batch.draw(logo, Gdx.graphics.getWidth()/2 - LOGO_WIDTH, Gdx.graphics.getHeight() - LOGO_HEIGHT*LOGO_SCALE_F, LOGO_WIDTH*LOGO_SCALE_F, LOGO_HEIGHT*LOGO_SCALE_F);
 	    batch.draw(logoCharacter.getKeyFrame(time, true), Gdx.graphics.getWidth()/2 - 100 , Gdx.graphics.getHeight()/2 + 100, 156, 200);
 	    batch.end();

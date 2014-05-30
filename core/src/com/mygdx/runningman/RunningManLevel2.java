@@ -43,8 +43,9 @@ public class RunningManLevel2 extends AbstractRunningManListener  {
 		arrayOfCharacters.add(enemy5);
 	
 		collisionManager.setToLevel2State(enemy3Array, enemy4Array, enemy5);
-		soundManager.playLevel2Music();
+		
 		soundManager.initLevel2Resources();
+		soundManager.playLevel2Music();
 		
 		state = Level2State.Part1;
 	}

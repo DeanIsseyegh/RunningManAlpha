@@ -3,6 +3,20 @@ RunningManPack.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+ContinueButton
+  rotate: false
+  xy: 1, 497
+  size: 671, 110
+  orig: 671, 110
+  offset: 0, 0
+  index: -1
+ContinueButtonPressed
+  rotate: false
+  xy: 1, 385
+  size: 671, 110
+  orig: 671, 110
+  offset: 0, 0
+  index: -1
 StartGameButton
   rotate: false
   xy: 1, 289

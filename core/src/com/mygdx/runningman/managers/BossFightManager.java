@@ -115,11 +115,12 @@ public class BossFightManager {
 		
 		if (boss1.getX() > mainChar.getX() + Gdx.graphics.getWidth() + (Gdx.graphics.getWidth() * 0.05f)){
 			boss1 = null;
-			runningMan.getSoundManager().destroyBoss1Resources();
+			runningMan.getSoundManager().destroyLevelResources();
 			isBoss1Dead = true;
 			
 			bossState = BossManagerState.NoBossFight;
-			runningMan.getGame().setScreen(runningMan.getGame().getLevel2());;
+			runningMan.getGame().setPoints(runningMan.getPoints());
+			runningMan.getGame().setScreen(runningMan.getGame().getLevel2());
 		}
 	}
 	

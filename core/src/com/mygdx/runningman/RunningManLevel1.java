@@ -21,8 +21,10 @@ public class RunningManLevel1 extends AbstractRunningManListener  {
 		this.backgroundWidth = IWorldObject.BG1_WIDTH;
 		initBackground(IWorldObject.BG1_IMAGE, IWorldObject.BG1_FLOOR, backgroundWidth);
 		
-		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, 15, 600, 700, 200);
-		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, 10, 600, 700, 200);
+		int numOfEnemy1 = 12;
+		int numOfEnemy2 = 8;
+		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, numOfEnemy1, 600, 700, 200);
+		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, numOfEnemy2, 600, 700, 200);
 		
 		bird1Array = initRandomCharacters(IWorldObject.BIRD1, 15, 1600, 2000, 1100);
 		arrayOfCharacters.addAll(enemy1Array);
