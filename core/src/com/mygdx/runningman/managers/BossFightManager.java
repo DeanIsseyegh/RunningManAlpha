@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.runningman.AbstractRunningManListener;
 import com.mygdx.runningman.RunningManLevel1;
 import com.mygdx.runningman.RunningManLevel2;
-import com.mygdx.runningman.worldobjects.AbstractWorldObject;
+import com.mygdx.runningman.MainGame.GameLevel;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.Boss1;
 import com.mygdx.runningman.worldobjects.characters.IEnemy;
@@ -48,10 +48,14 @@ public class BossFightManager {
 				bossFight1Logic(deltaTime, batch);
 				break;
 				
+			case BossFight2:
+				bossFight2Logic(deltaTime, batch);
+				break;
+				
 			default: break;
 		}	
 	}
-	
+
 	public enum BossManagerState{
 		NoBossFight,
 		BossFight1,
@@ -97,6 +101,10 @@ public class BossFightManager {
 		//EMPTY FOR NOW
 	}
 	
+	private void bossFight2Logic(float deltaTime, SpriteBatch batch) {
+		//EMPTY FOR NOW
+	}
+	
 	/**
 	 * Handles the first boss fight conditions. Adds/removes the
 	 * "Boss Incoming" label and handles music resources.
@@ -113,14 +121,14 @@ public class BossFightManager {
 			
 		boss1.update(deltaTime, batch);
 		
-		if (boss1.getX() > mainChar.getX() + Gdx.graphics.getWidth() + (Gdx.graphics.getWidth() * 0.05f)){
+		if (boss1.getX() > mainChar.getX() + Gdx.graphics.getWidth() + (Gdx.graphics.getWidth() * 0.05f) && !runningMan.isGameOver()){
 			boss1 = null;
 			runningMan.getSoundManager().destroyLevelResources();
 			isBoss1Dead = true;
 			
 			bossState = BossManagerState.NoBossFight;
 			runningMan.getGame().setPoints(runningMan.getPoints());
-			runningMan.getGame().setScreen(runningMan.getGame().getLevel2());
+			runningMan.getGame().setScreen(runningMan.getGame().getLevelCompletedScreen());
 		}
 	}
 	

@@ -3,7 +3,6 @@ package com.mygdx.runningman.worldobjects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -95,7 +94,7 @@ public abstract class AbstractWorldObject implements IWorldObject {
 	
 	public void die(){
 		stopMovingAndAnimation();
-		velocity.x = -250;
+		velocity.x = -450;
 	}
 
 	@Override

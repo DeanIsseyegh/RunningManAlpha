@@ -2,11 +2,8 @@ package com.mygdx.runningman.screens;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -25,7 +22,6 @@ import com.mygdx.runningman.MainGame;
 import com.mygdx.runningman.managers.SoundManager;
 import com.mygdx.runningman.worldobjects.AbstractWorldObject;
 import com.mygdx.runningman.worldobjects.IWorldObject;
-import com.mygdx.runningman.worldobjects.characters.MainCharacter;
 
 public class MainMenu implements Screen {
 

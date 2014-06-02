@@ -60,6 +60,7 @@ public abstract class AbstractRunningManListener implements Screen
 	private boolean rightScreenTouched = false;
 	
 	private boolean isGameOver = false;
+
 	private boolean hasDeathSoundPlayed = false;
 	
 	protected CollisionManager collisionManager;
@@ -399,6 +400,10 @@ public abstract class AbstractRunningManListener implements Screen
 	
 	public boolean isRightScreenTouched() {
 		return rightScreenTouched;
+	}
+	
+	public boolean isGameOver() {
+		return isGameOver;
 	}
 	
 	public void setGameOver(boolean isGameOver) {

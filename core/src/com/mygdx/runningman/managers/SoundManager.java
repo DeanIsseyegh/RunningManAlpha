@@ -1,7 +1,5 @@
 package com.mygdx.runningman.managers;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -10,6 +8,7 @@ public class SoundManager {
 	
 	private static final String MAINMENU_MUSIC = "music/MainMenuMusic.wav";
 	private static final String GAMEOVER_SOUND = "music/GameOverSound.mp3";
+	private static final String LEVELCOMPLETE_MUSIC = "music/LevelCompletedMusic.wav";
 	private static final String LEVEL1_MUSIC = "music/Level1Music.mp3";
 	private static final String LEVEL2_MUSIC = "music/Level2Music.mp3";
 	private static final String BOSS1_MUSIC = "music/Boss1Music.mp3";
@@ -28,6 +27,7 @@ public class SoundManager {
 	
 	private Music mainMenuMusic;
 	private Sound gameOverSound;
+	private Music levelCompleteMusic;
 	private Music level1Music;
 	private Music leve2Music;
 	private Music boss1Music;
@@ -57,10 +57,10 @@ public class SoundManager {
 	public void mute(){
 		mute = true;
 	}
+	
 	public void playMainMenuMusic(){
 		if (!mute){
-			if (mainMenuMusic == null)
-				mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal(MAINMENU_MUSIC));
+			mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal(MAINMENU_MUSIC));
 			mainMenuMusic.setVolume(0.25f);
 			mainMenuMusic.play();
 		}
@@ -72,6 +72,25 @@ public class SoundManager {
 				mainMenuMusic.stop();
 				mainMenuMusic.dispose();
 				mainMenuMusic = null;
+			}
+		}
+	}
+	
+	public void playLevelCompletedMusic(){
+		System.out.println("PLAYING LEVEL COMPLETED MUSIC");
+		if (!mute){
+			levelCompleteMusic = Gdx.audio.newMusic(Gdx.files.internal(LEVELCOMPLETE_MUSIC));
+			levelCompleteMusic.setVolume(0.25f);
+			levelCompleteMusic.play();
+		}
+	}
+	
+	public void stopLevelCompletedMusic(){
+		System.out.println("STOPPING IT");
+		if (!mute){
+			if (levelCompleteMusic != null){
+				levelCompleteMusic.stop();
+				levelCompleteMusic.dispose();
 			}
 		}
 	}
@@ -100,7 +119,6 @@ public class SoundManager {
 			if (level1Music != null){
 				level1Music.stop();
 				level1Music.dispose();
-				level1Music = null;
 			}
 		}
 	}
@@ -185,27 +203,39 @@ public class SoundManager {
 	
 	public void destroyLevelResources() {
 		if (!mute){
+			try{
+				System.out.println("DESTORYING");
 			//Level1 Resources
 			if (level1Music != null)
 				level1Music.dispose();
+			
 			if (boss1Music != null)
 				boss1Music.dispose();
+			
 			if (boss1LandedSound != null)
 				boss1LandedSound.dispose();
+			
 			if (boss1Attack != null)
 				boss1Attack.dispose();
+			
 			if (boss1Hurt != null)	
 				boss1Hurt.dispose();
+			
 			if (boss1Rage != null)	
 				boss1Rage.dispose();
+			
 			if (boss1Death != null)	
 				boss1Death.dispose();
 			
 			//Level 2 resources
 			if (enemy5Hurt != null)
 				enemy5Hurt.dispose();
+			
 			if (leve2Music != null)
 				leve2Music.dispose();
+			} catch (Exception e){
+				System.out.println("CAUGHT");
+			}
 		}
 	}
 	

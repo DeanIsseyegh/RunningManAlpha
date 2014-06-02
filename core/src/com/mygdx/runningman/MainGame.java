@@ -1,7 +1,6 @@
 package com.mygdx.runningman;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Screen;
 import com.mygdx.runningman.managers.SoundManager;
 import com.mygdx.runningman.screens.GameOverScreen;
 import com.mygdx.runningman.screens.LevelCompletedScreen;
@@ -20,6 +19,8 @@ public class MainGame extends Game {
 	
 	private long points;
 	
+	private GameLevel state;
+
 	@Override
 	public void create() {
 		soundManager = new SoundManager();
@@ -31,11 +32,25 @@ public class MainGame extends Game {
 		level1 = new RunningManLevel1(this, soundManager);
 		level2 = new RunningManLevel2(this, soundManager);
 		
-		setScreen(mainMenu);
 		//soundManager.mute();
-		//setScreen(level1);
+		state = GameLevel.LEVEL1;
+		
+		setScreen(mainMenu);
 	}
 
+	public enum GameLevel{
+		LEVEL1,
+		LEVEL2
+	}
+	
+	public GameLevel getNextLevel(){
+		switch(state){
+		case LEVEL1:
+			return GameLevel.LEVEL2;
+		default:
+			return null;
+		}
+	}
 	
 	public MainMenu getMainMenu() {
 		return mainMenu;
@@ -56,7 +71,6 @@ public class MainGame extends Game {
 	public RunningManLevel2 getLevel2() {
 		return level2;
 	}
-
 
 	public long getPoints() {
 		return points;

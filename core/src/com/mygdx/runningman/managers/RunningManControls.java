@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.runningman.AbstractRunningManListener;
-import com.mygdx.runningman.RunningManLevel1;
 
 public class RunningManControls implements GestureListener{
 

@@ -36,6 +36,7 @@ public interface IWorldObject {
 	
 	static final String BLOOD_SPLAT 	  		 = "bloodsplat.png";
 	static final String METAL_SPLAT 	  		 = "MetalSplat2.png";
+	static final String STARS					 = "StarCircle.png";
 	static final String BIRD1_IMAGE 	 		 = "Bird1.png";
 	static final String ENEMY3_PROJECTILE		 =	 "enemies/Enemy3_Projectile.png";
 	static final String ENEMY5_PROJECTILE_RED	 = "enemies/Enemy5ProjectileRed.png";

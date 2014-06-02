@@ -21,8 +21,8 @@ public class RunningManLevel1 extends AbstractRunningManListener  {
 		this.backgroundWidth = IWorldObject.BG1_WIDTH;
 		initBackground(IWorldObject.BG1_IMAGE, IWorldObject.BG1_FLOOR, backgroundWidth);
 		
-		int numOfEnemy1 = 12;
-		int numOfEnemy2 = 8;
+		int numOfEnemy1 = 12; //12
+		int numOfEnemy2 = 7; //7
 		enemy1Array = initRandomEnemies(IWorldObject.ENEMY1, numOfEnemy1, 600, 700, 200);
 		enemy2Array = initRandomEnemies(IWorldObject.ENEMY2, numOfEnemy2, 600, 700, 200);
 		

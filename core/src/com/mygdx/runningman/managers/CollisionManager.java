@@ -79,6 +79,7 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
 			} else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
+				Gdx.input.vibrate(2);
 				e.kill();
 				runningMan.setPoints(runningMan.getPoints() + 200);
 			}
@@ -88,6 +89,7 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
 			} else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
+				Gdx.input.vibrate(2);
 				e.kill();
 				runningMan.setPoints(runningMan.getPoints() + 200);
 			}
@@ -100,6 +102,10 @@ public class CollisionManager {
 		handleEnemy5Projectiles();
 	}
 		
+	/**
+	 * Handles the projectiles that enemy5 (miniboss) shoots. If the projectile is orange it is reflectable
+	 * and will hurt the enemy. If it is red, then it is not reflectable and the mainChar must jump to avoid
+	 */
 	private void handleEnemy5Projectiles(){
 		
 		// Handle the projectile hitting the mainChar or his weapon
