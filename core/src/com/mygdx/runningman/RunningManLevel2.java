@@ -2,8 +2,7 @@ package com.mygdx.runningman;
 
 import java.util.ArrayList;
 
-import android.util.Log;
-
+import com.mygdx.runningman.managers.GameHUDManager;
 import com.mygdx.runningman.managers.SoundManager;
 import com.mygdx.runningman.worldobjects.IWorldObject;
 import com.mygdx.runningman.worldobjects.characters.Enemy5;
@@ -25,8 +24,9 @@ public class RunningManLevel2 extends AbstractRunningManListener  {
 	private int numOfEnemy4;
 
 	public void show() {
+		System.out.println("Show called..");
 		super.show();
-		
+		System.out.println("Super show called :)");
 		this.backgroundWidth = IWorldObject.BG2_WIDTH;
 		initBackground(IWorldObject.BG2_IMAGE, IWorldObject.BG2_FLOOR, backgroundWidth);
 		
@@ -66,12 +66,10 @@ public class RunningManLevel2 extends AbstractRunningManListener  {
 	
 	public void enemy3Killed(){
 		numOfEnemy3 = numOfEnemy3 -1;
-		Log.v(TAG, "Enemy3Count: " + numOfEnemy3);
 	}
 	
 	public void enemy4Killed(){
 		numOfEnemy4 = numOfEnemy4 - 1;
-		Log.v(TAG, "Enemy4Count: " + numOfEnemy4);
 	}
 	
 	public Level2State getState() {

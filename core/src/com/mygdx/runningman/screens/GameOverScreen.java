@@ -230,6 +230,12 @@ public class GameOverScreen implements Screen {
 	public void hide() {
 		soundManager.stopGameOverSound();
 		hasGameOverSoundPlayed = false;
+		batch.dispose();
+		buttonAtlas.dispose();
+		logo.dispose();
+		skin.dispose();
+		stage.dispose();
+		
 	}
 
 

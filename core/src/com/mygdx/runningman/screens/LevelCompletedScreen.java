@@ -36,7 +36,6 @@ public class LevelCompletedScreen implements Screen {
 	private int actualScreenWidth;
 	private int actualScreenHeight;
 	private float time;
-	private boolean hasGameOverSoundPlayed = false;
 	
 	private Texture logo;
 	private OrthographicCamera camera;
@@ -111,6 +110,7 @@ public class LevelCompletedScreen implements Screen {
 						continueGame();
 					}
 				})));
+				continueGame();
 				return true;
 			}
 		});
@@ -120,7 +120,6 @@ public class LevelCompletedScreen implements Screen {
 	private void continueGame(){
 		soundManager.stopLevelCompletedMusic();
 		GameLevel gameLevel = game.getNextLevel();
-		System.out.println("NEXT LEVEL IS: " + gameLevel);
 		switch (gameLevel){
 		case LEVEL1:
 			game.setScreen(game.getLevel1());
@@ -202,6 +201,11 @@ public class LevelCompletedScreen implements Screen {
 
 	@Override
 	public void hide() {
+		batch.dispose();
+		buttonAtlas.dispose();
+		logo.dispose();
+		skin.dispose();
+		stage.dispose();
 	}
 
 

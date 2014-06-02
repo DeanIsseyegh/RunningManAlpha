@@ -206,33 +206,51 @@ public class SoundManager {
 			try{
 				System.out.println("DESTORYING");
 			//Level1 Resources
-			if (level1Music != null)
+			if (level1Music != null){
+				level1Music.stop();
 				level1Music.dispose();
+			}
 			
-			if (boss1Music != null)
+			if (boss1Music != null){
+				boss1Music.stop();
 				boss1Music.dispose();
+			}
 			
-			if (boss1LandedSound != null)
+			if (boss1LandedSound != null){
+				boss1LandedSound.stop();
 				boss1LandedSound.dispose();
+			}
 			
-			if (boss1Attack != null)
+			if (boss1Attack != null){
+				boss1Attack.stop();
 				boss1Attack.dispose();
+			}
 			
-			if (boss1Hurt != null)	
+			if (boss1Hurt != null){
+				boss1Hurt.stop();
 				boss1Hurt.dispose();
+			}
 			
-			if (boss1Rage != null)	
+			if (boss1Rage != null){	
+				boss1Rage.stop();
 				boss1Rage.dispose();
+			}
 			
-			if (boss1Death != null)	
+			if (boss1Death != null){
+				boss1Death.stop();
 				boss1Death.dispose();
+			}
 			
 			//Level 2 resources
-			if (enemy5Hurt != null)
+			if (enemy5Hurt != null){
+				enemy5Hurt.stop();
 				enemy5Hurt.dispose();
+			}
 			
-			if (leve2Music != null)
+			if (leve2Music != null){
+				leve2Music.stop();
 				leve2Music.dispose();
+			}
 			} catch (Exception e){
 				System.out.println("CAUGHT");
 			}

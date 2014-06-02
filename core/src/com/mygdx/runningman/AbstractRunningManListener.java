@@ -68,7 +68,7 @@ public abstract class AbstractRunningManListener implements Screen
 	protected SoundManager soundManager;
 	protected BossFightManager bossFightManager;
 
-	private MainGame game;
+	protected MainGame game;
 
 	public AbstractRunningManListener(MainGame game, SoundManager soundManager){
 		this.game = game;
@@ -84,6 +84,7 @@ public abstract class AbstractRunningManListener implements Screen
 	@Override
 	public void show()
 	{
+		gameHUDManager = new GameHUDManager();
 		scrollSpeed = 250;
 		isGameOver = false;
 		hasDeathSoundPlayed = false;
@@ -92,19 +93,24 @@ public abstract class AbstractRunningManListener implements Screen
 		fadeTimeAlpha = 1;
 		timeSinceDeath = 0;
 		
+		System.out.println("Char about to get made...");
 		mainChar = new MainCharacter(scrollSpeed, this);
+		System.out.println("Char made....");
 		arrayOfCharacters = new ArrayList<IWorldObject>();
+		System.out.println("array of chars made");
 		arrayOfCharacters.add(mainChar);
-		
+		System.out.println("Added mainChar to array");
 		batch = new SpriteBatch();
+		System.out.println("New batch");
 		camera = new OrthographicCamera();
+		System.out.println("New Cmaera");
 		fixedCamera = new OrthographicCamera();
+		System.out.println("Fixed cam");
 		configureCamera();
 		
 		Gdx.input.setInputProcessor(new GestureDetector(new RunningManControls(this))); //setup custom controls
 		collisionManager = new CollisionManager(this, mainChar);
 		bossFightManager = new BossFightManager(this, mainChar);
-		gameHUDManager = new GameHUDManager();
 	}
 	
 	
@@ -138,7 +144,7 @@ public abstract class AbstractRunningManListener implements Screen
 			if (isEnemy1)
 				arrayOfEnemies.add(new Enemy1(randomInt, mainChar));
 			else if (isEnemy2)
-				arrayOfEnemies.add(new Enemy2(randomInt));
+				arrayOfEnemies.add(new Enemy2(randomInt, mainChar));
 			else if (isEnemy3)
 				arrayOfEnemies.add(new Enemy3(randomInt, mainChar, this));
 			else if (isEnemy4)
@@ -306,8 +312,12 @@ public abstract class AbstractRunningManListener implements Screen
 	
 	@Override
 	public void hide(){
+		System.out.println("HIDE CALLED TIME TO DIPSOSEEE");
 		batch.dispose();
 		background.dispose();
+		backgroundFloor.dispose();
+		gameHUDManager.dispose();
+		mainChar.dispose();
 	}
 	
 	/**

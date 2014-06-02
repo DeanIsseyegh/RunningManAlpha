@@ -1,6 +1,7 @@
 package com.mygdx.runningman;
 
 import com.badlogic.gdx.Game;
+import com.mygdx.runningman.managers.GameHUDManager;
 import com.mygdx.runningman.managers.SoundManager;
 import com.mygdx.runningman.screens.GameOverScreen;
 import com.mygdx.runningman.screens.LevelCompletedScreen;

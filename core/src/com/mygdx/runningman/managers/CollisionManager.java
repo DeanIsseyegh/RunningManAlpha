@@ -79,7 +79,7 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
 			} else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
-				Gdx.input.vibrate(2);
+				//Gdx.input.vibrate(2);
 				e.kill();
 				runningMan.setPoints(runningMan.getPoints() + 200);
 			}
@@ -89,7 +89,7 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
 			} else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
-				Gdx.input.vibrate(2);
+				//Gdx.input.vibrate(2);
 				e.kill();
 				runningMan.setPoints(runningMan.getPoints() + 200);
 			}
@@ -140,7 +140,7 @@ public class CollisionManager {
 			if (mainChar.getBoundingBox().overlaps(e.getBoundingBox())){
 				runningMan.setGameOver(true);
 			} else if (weapon1 != null && weapon1.getBoundingBox().overlaps(e.getBoundingBox())){
-				Gdx.input.vibrate(2);
+				//Gdx.input.vibrate(2);
 				e.kill();
 				runningMan.setPoints(runningMan.getPoints() + 200);
 			}
@@ -205,4 +205,5 @@ public class CollisionManager {
 	public void setEnemy5Projectile(Enemy5Projectile enemy5Projectile) {
 		this.enemy5Projectile = enemy5Projectile;
 	}
+
 }

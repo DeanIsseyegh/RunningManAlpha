@@ -22,18 +22,20 @@ public class MainCharacter extends AbstractWorldObject {
 
 	public MainCharacter(int scrollSpeed, AbstractRunningManListener runningMan){
 		super(MAIN_CHAR_IMAGE); //608 x 240 pixels - 8 COLS, 2 ROWS
-		width = 125;
-		height = 200;
+		System.out.println("Width and h gunna b set");
 		position = new Vector2(0, 0);
 		velocity = new Vector2(scrollSpeed, 0);
 		isInAir = false;
 		width = 120;
 		height = 200;
+		System.out.println("Height and stuff stuf");
 		int FRAME_COLS = 8;
 		int FRAME_ROWS = 2;
+		System.out.println("Frames...");
 		TextureRegion[] aniFrames = animateFromSpriteSheet(FRAME_COLS, FRAME_ROWS, spriteSheet);
 		animation = new Animation(0.05f, aniFrames);
 		this.runningMan = runningMan;
+		System.out.println("Running set..");
 		lastSwordAttack = 2;
 	}
 

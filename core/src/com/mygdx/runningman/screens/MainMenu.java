@@ -199,6 +199,12 @@ public class MainMenu implements Screen {
 	@Override
 	public void hide() {
 		soundManager.stopMainMenuMusic();
+		batch.dispose();
+		buttonAtlas.dispose();
+		logo.dispose();
+		skin.dispose();
+		stage.dispose();
+		
 	}
 
 

@@ -44,6 +44,10 @@ public class GameHUDManager {
 		stage.addActor(attackLabel);
 	}
 	
+	public void dispose(){
+		stage.dispose();
+		bitFont.dispose();
+	}
 	public void showBossLabel(){
 		stage.addActor(bossIncomingLabel);
 	}

@@ -53,6 +53,9 @@ public class Enemy1 extends AbstractWorldObject implements IEnemy {
 		
 		batch.draw(animation.getKeyFrame(time, true), position.x , position.y, width, height);
 		
+		if (!isDisposed)
+			if (position.x < mainChar.getX() - 600 )
+				dispose();
 	}
 
 	@Override

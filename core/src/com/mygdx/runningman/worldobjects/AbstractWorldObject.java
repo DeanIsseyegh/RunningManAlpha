@@ -20,6 +20,8 @@ public abstract class AbstractWorldObject implements IWorldObject {
 	protected int numOfXEmptyPxls;
 	protected float time;
 	
+	protected boolean isDisposed;
+	
 	/**
 	 * Default constructor that initialises the boundsBox variable - the only necessary member that requires no parameters
 	 * to be initialised.
@@ -120,5 +122,11 @@ public abstract class AbstractWorldObject implements IWorldObject {
 	@Override
 	public Rectangle getBoundingBox() {
 		return boundsBox;
+	}
+	
+	public void dispose(){
+		System.out.println("ME GO BYEBYE");
+		spriteSheet.dispose();
+		isDisposed = true;
 	}
 }

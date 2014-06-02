@@ -165,7 +165,6 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		//Handle boss landing from sky and make sure he doesn't go below ground
 		if (position.y <= 0){
 			if (!hasBossLanded){
-				Gdx.input.vibrate(1000);
 				runningMan.getSoundManager().playBoss1LandedSound();
 				runningMan.getSoundManager().playBoss1Music();
 			}
@@ -288,6 +287,7 @@ public class Boss1 extends AbstractWorldObject implements IEnemy {
 		runningMan.getSoundManager().playBoss1HurtSound();
 		if (currentBossHealth == 6 || currentBossHealth == 3) runningMan.getSoundManager().playBoss1RageSound();
 		bloodSplat = new BloodSplatProjectile(position.x + width/2 - 50, position.y);
+		kill();
 	}
 
 }

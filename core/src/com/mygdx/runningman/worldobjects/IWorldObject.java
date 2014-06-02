@@ -56,4 +56,5 @@ public interface IWorldObject {
 	public void stopMovingAndAnimation();
 	public void die();
 	
+	public void dispose();
 }
